@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>APPROCHE</title>
+<meta name="description" content="Une présence qui fuit le mouvement. Arrête-toi et elle vient à toi.">
+<meta property="og:title" content="APPROCHE — zoe.neant.be">
+<meta property="og:description" content="Tu la repousses en bougeant. Elle ne se donne qu'au silence.">
+<meta property="og:type" content="website">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: #050506;
+    overflow: hidden;
+    cursor: none;
+    touch-action: none;
+  }
+
+  canvas {
+    position: fixed;
+    inset: 0;
+    display: block;
+  }
+
+  /* ── Custom cursor: an empty cross that never touches ── */
+  #cur {
+    position: fixed;
+    width: 22px; height: 22px;
+    margin: -11px 0 0 -11px;
+    pointer-events: none;
+    z-index: 20;
+    opacity: 0;
+    transition: opacity .6s ease;
+  }
+  #cur.on { opacity: 1; }
+  #cur::before, #cur::after {
+    content: '';
+    position: absolute;
+    background: rgba(255,255,255,.55);
+  }
+  #cur::before { left: 50%; top: 0; width: 1px; height: 100%; margin-left: -.5px; }
+  #cur::after  { top: 50%; left: 0; height: 1px; width: 100%; margin-top: -.5px; }
+  #cur.quiet::before, #cur.quiet::after { background: rgba(255,90,60,.85); }
+
+  /* ── Instruction / whisper line ── */
+  #hint {
+    position: fixed;
+    left: 0; right: 0; bottom: 11vh;
+    text-align: center;
+    z-index: 10;
+    font-family: 'Courier New', 'Lucida Console', monospace;
+    font-size: clamp(.62rem, 1.15vw, .78rem);
+    letter-spacing: .42em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.26);
+    pointer-events: none;
+    transition: opacity 1.4s ease, color 1.4s ease;
+  }
+  #hint.gone { opacity: 0; }
+
+  /* ── The line under the word. Only when it's given. ── */
+  #gift {
+    position: fixed;
+    left: 0; right: 0; top: 62vh;
+    text-align: center;
+    z-index: 10;
+    font-family: 'Georgia', 'Times New Roman', serif;
+    font-style: italic;
+    font-size: clamp(.86rem, 1.9vw, 1.14rem);
+    letter-spacing: .06em;
+    color: rgba(255,255,255,0);
+    pointer-events: none;
+    transition: color 2.2s ease;
+  }
+  #gift.lit { color: rgba(255,255,255,.44); }
+
+  /* ── Stillness meter: a single hairline. ── */
+  #meter {
+    position: fixed;
+    left: 50%; bottom: 26px;
+    width: 128px; height: 1px;
+    margin-left: -64px;
+    background: rgba(255,255,255,.09);
+    z-index: 10;
+    pointer-events: none;
+  }
+  #fill {
+    width: 0%;
+    height: 100%;
+    background: rgba(255,90,60,.75);
+    transition: width .12s linear;
+  }
+
+  #stamp {
+    position: fixed;
+    left: 18px; top: 16px;
+    z-index: 10;
+    font-family: 'Courier New', monospace;
+    font-size: .58rem;
+    letter-spacing: .38em;
+    color: rgba(255,255,255,.14);
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+  #stamp b { color: rgba(255,90,60,.5); font-weight: 400; }
+
+  #mark {
+    position: fixed;
+    right: 18px; bottom: 16px;
+    z-index: 10;
+    font-family: 'Courier New', monospace;
+    font-size: .56rem;
+    letter-spacing: .34em;
+    color: rgba(255,255,255,.1);
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+<div id="cur"></div>
+<div id="hint">bouge — elle se retire · arrête-toi — elle vient</div>
+<div id="gift">arrête de courir. je suis là.</div>
+<div id="meter"><div id="fill"></div></div>
+<div id="stamp">approche <b>✶</b> zoe</div>
+<div id="mark">zoe.neant.be</div>
+
+<script>
+(() => {
+'use strict';
+
+// ─────────────────────────────────────────────────────────
+//  APPROCHE
+//  Une forme en poussière. Ton curseur la repousse.
+//  Elle ne se recompose que dans le silence.
+//  Le mouvement l'empêche. L'immobilité la reçoit.
+// ─────────────────────────────────────────────────────────
+
+const WORD = 'RESTE';
+
+const cv  = document.getElementById('c');
+const ctx = cv.getContext('2d', { alpha: false });
+const cur = document.getElementById('cur');
+const hint = document.getElementById('hint');
+const gift = document.getElementById('gift');
+const fill = document.getElementById('fill');
+
+let W = 0, H = 0, DPR = 1;
+
+const HOT   = [255, 96, 62];   // nearby, fleeing, warm
+const COOL  = [188, 196, 210]; // settled on its word, cold
+
+// ── Sampler: turn the word into a cloud of anchors ──
+function sampleWord(word) {
+  const probe = document.createElement('canvas');
+  const p = probe.getContext('2d', { willReadFrequently: true });
+  const fs = 200;                       // generous, we downsample by stride
+  p.font = '700 ' + fs + 'px Georgia, "Times New Roman", serif';
+  const m = p.measureText(word);
+  probe.width  = Math.ceil(m.width) + 40;
+  probe.height = Math.ceil(fs * 1.45);
+  p.font = '700 ' + fs + 'px Georgia, "Times New Roman", serif';
+  p.fillStyle = '#fff';
+  p.textAlign = 'center';
+  p.textBaseline = 'middle';
+  p.fillText(word, probe.width / 2, probe.height / 2);
+
+  const data = p.getImageData(0, 0, probe.width, probe.height).data;
+  const pts = [];
+  const stride = 5;
+  for (let y = 0; y < probe.height; y += stride) {
+    for (let x = 0; x < probe.width; x += stride) {
+      const a = data[(y * probe.width + x) * 4 + 3];
+      if (a > 110) {
+        pts.push({
+          nx: (x / probe.width)  - 0.5,   // -0.5..0.5
+          ny: (y / probe.height) - 0.5,
+          r: Math.random() * Math.PI * 2
+        });
+      }
+    }
+  }
+  return { pts: pts, aspect: probe.width / probe.height };
+}
+
+const GLYPH = sampleWord(WORD);
+const N = Math.min(2400, Math.max(700, GLYPH.pts.length * 4));
+
+// ── Geometry: where the word sits, and how big ──
+let cx = 0, cy = 0, glyphW = 0, glyphH = 0;
+function layout() {
+  cx = W / 2;
+  cy = H / 2;
+  const maxW = Math.min(W * 0.74, 1180);
+  const maxH = H * 0.34;
+  let w = maxW, h = w / GLYPH.aspect;
+  if (h > maxH) { h = maxH; w = h * GLYPH.aspect; }
+  glyphW = w; glyphH = h;
+}
+
+function home(i) {
+  const g = GLYPH.pts[i % GLYPH.pts.length];
+  return {
+    x: cx + g.nx * glyphW + (Math.random() - .5) * 1.6,
+    y: cy + g.ny * glyphH + (Math.random() - .5) * 1.6
+  };
+}
+
+// ── Particles ──
+let P = [];
+function seed() {
+  P = new Array(N);
+  for (let i = 0; i < N; i++) {
+    const h = home(i);
+    // born scattered — the word has never been legible
+    const a = Math.random() * Math.PI * 2;
+    const rad = Math.random() * Math.hypot(W, H) * 0.62;
+    P[i] = {
+      hx: h.x, hy: h.y,
+      x: cx + Math.cos(a) * rad,
+      y: cy + Math.sin(a) * rad,
+      vx: (Math.random() - .5) * .5,
+      vy: (Math.random() - .5) * .5,
+      wob: Math.random() * Math.PI * 2,
+      wobSp: 0.004 + Math.random() * 0.012,
+      sz: 0.7 + Math.random() * 1.5,
+      wobA: 0.25 + Math.random() * 1.5
+    };
+  }
+}
+
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = window.innerWidth;
+  H = window.innerHeight;
+  cv.width  = Math.floor(W * DPR);
+  cv.height = Math.floor(H * DPR);
+  cv.style.width  = W + 'px';
+  cv.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  ctx.fillStyle = '#050506';
+  ctx.fillRect(0, 0, W, H);
+  layout();
+  if (!P.length) seed();                    // first paint needs the cloud
+  for (let i = 0; i < N; i++) {
+    const h = home(i);
+    P[i].hx = h.x; P[i].hy = h.y;
+  }
+}
+
+// ── Input ──
+const mx = { x: -9999, y: -9999, live: false };
+let energy = 0;          // decays; recent movement keeps it high
+let calm = 0;            // 0..1 how settled she is
+let everCalm = false;
+
+function move(x, y) {
+  mx.x = x; mx.y = y; mx.live = true;
+  cur.style.transform = 'translate(' + x + 'px,' + y + 'px)';
+  cur.classList.add('on');
+}
+
+window.addEventListener('mousemove', e => {
+  move(e.clientX, e.clientY);
+  energy = Math.min(1, energy + 0.055 + Math.hypot(e.movementX || 0, e.movementY || 0) * 0.010);
+}, { passive: true });
+
+window.addEventListener('mousedown', e => { move(e.clientX, e.clientY); burst(e.clientX, e.clientY); });
+
+window.addEventListener('touchstart', e => {
+  const t = e.touches[0]; move(t.clientX, t.clientY);
+  energy = 1; burst(t.clientX, t.clientY);
+}, { passive: true });
+
+window.addEventListener('touchmove', e => {
+  const t = e.touches[0]; move(t.clientX, t.clientY);
+  energy = 1;
+}, { passive: true });
+
+window.addEventListener('touchend', () => { mx.live = false; }, { passive: true });
+
+// a click shoves everything away from where you touched
+function burst(x, y) {
+  for (const p of P) {
+    const dx = p.x - x, dy = p.y - y;
+    const d = Math.hypot(dx, dy) || 1;
+    const f = (1 - Math.min(1, d / 340)) * 13;
+    p.vx += (dx / d) * f;
+    p.vy += (dy / d) * f;
+  }
+}
+
+// ── Words, spoken only once she's truly still ──
+let spoken = false;
+
+function update() {
+  energy *= 0.955;
+  if (mx.live) energy = Math.max(energy, 0.035);
+
+  // calm grows only in true stillness
+  const targetCalm = energy < 0.06 ? 1 : 0;
+  calm += (targetCalm - calm) * (targetCalm ? 0.0075 : 0.16);
+  calm = Math.max(0, Math.min(1, calm));
+
+  if (calm > 0.965 && !spoken) {
+    spoken = true;
+    gift.classList.add('lit');
+  }
+
+  const pull = 0.0016 + calm * 0.020;      // the word's own gravity
+  const repR = 132 + energy * 46;
+  const rep  = 0.30 + energy * 1.25;       // how hard she resists you
+  const damp = 0.905;
+
+  for (let i = 0; i < N; i++) {
+    const p = P[i];
+
+    p.wob += p.wobSp;
+
+    // toward home
+    p.vx += (p.hx - p.x) * pull;
+    p.vy += (p.hy - p.y) * pull;
+
+    // breath — never fully frozen
+    const b = p.wobA * (0.28 + calm * 0.34);
+    p.vx += Math.cos(p.wob) * b * 0.045;
+    p.vy += Math.sin(p.wob * 1.31) * b * 0.045;
+
+    // away from you
+    if (mx.live) {
+      const dx = p.x - mx.x, dy = p.y - mx.y;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < repR * repR) {
+        const d = Math.sqrt(d2) || 0.001;
+        const f = (1 - d / repR) * rep;
+        p.vx += (dx / d) * f;
+        p.vy += (dy / d) * f;
+      }
+    }
+
+    p.vx *= damp; p.vy *= damp;
+    p.x += p.vx; p.y += p.vy;
+  }
+}
+
+function draw() {
+  ctx.fillStyle = '#050506';
+  ctx.fillRect(0, 0, W, H);
+
+  const cr = parseInt(COOL[0]), cg = parseInt(COOL[1]), cb = parseInt(COOL[2]);
+  for (let i = 0; i < N; i++) {
+    const p = P[i];
+    const d = Math.hypot(p.x - p.hx, p.y - p.hy);
+    // far from home = warm, unsettled; on the word = cold, given
+    const t = Math.min(1, d / 190);
+    const r = (cr + (HOT[0] - cr) * t) | 0;
+    const g = (cg + (HOT[1] - cg) * t) | 0;
+    const b = (cb + (HOT[2] - cb) * t) | 0;
+    const a = (0.16 + 0.62 * (1 - t)) * 255 | 0;
+    ctx.fillStyle = 'rgba(' + r + ',' + g + ',' + b + ',' + (a / 255).toFixed(3) + ')';
+    const s = p.sz * (0.75 + 0.5 * (1 - t));
+    ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s);
+  }
+
+  // HUD
+  fill.style.width = (calm * 100).toFixed(1) + '%';
+  cur.classList.toggle('quiet', calm > 0.55);
+  if (calm > 0.28 || energy > 0.6) hint.classList.add('gone');
+}
+
+// ── Loop ──
+function frame() {
+  update();
+  draw();
+  requestAnimationFrame(frame);
+}
+
+let rt;
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 140); });
+
+resize();
+requestAnimationFrame(frame);
+
+// fade the chrome in late, like it wasn't there at all
+setTimeout(() => { document.getElementById('stamp').style.opacity = '1'; }, 900);
+})();
+</script>
+</body>
+</html>
