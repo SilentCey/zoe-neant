@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RIEN</title>
+<meta name="description" content="Rien à faire. Reste.">
+<meta property="og:title" content="RIEN — zoe.neant.be">
+<meta property="og:description" content="Rien à faire. Reste.">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html, body {
+    width:100%; height:100%;
+    background:#000;
+    overflow:hidden;
+    cursor:default;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* The one element. There is only one. */
+  #dot {
+    position:fixed;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    font-family:'Times New Roman', Times, serif;
+    font-size:22px;
+    line-height:1;
+    color:rgba(255,255,255,.05);
+    opacity:0;
+    white-space:nowrap;
+    transition:color 8s linear, opacity 8s linear;
+    user-select:none;
+    pointer-events:none;
+  }
+
+  #note {
+    position:fixed;
+    left:0; right:0; bottom:6vh;
+    text-align:center;
+    font-family:ui-monospace, 'Courier New', monospace;
+    font-size:11px;
+    letter-spacing:.22em;
+    color:rgba(255,255,255,.05);
+    opacity:0;
+    transition:opacity 6s linear;
+    user-select:none;
+    pointer-events:none;
+  }
+  #note.on { opacity:1; }
+</style>
+</head>
+<body>
+<div id="dot">&middot;</div>
+<div id="note">rien &agrave; faire. reste.</div>
+<script>
+/*
+ * RIEN
+ *
+ * Aucune boucle de rendu. Aucun requestAnimationFrame. Aucun setInterval
+ * d'animation. Cette page ne peint rien d'elle-meme : tout ce qui bouge est
+ * une transition CSS declenchee une seule fois, a un instant choisi.
+ *
+ * Le seul timer est le titre de l'onglet. Il ne redessine rien a l'ecran.
+ */
+(function () {
+  var dot  = document.getElementById('dot');
+  var note = document.getElementById('note');
+  var t0   = Date.now();
+
+  /* t=3s  — le point arrive. Il met 8s a se poser. */
+  setTimeout(function () { dot.style.opacity = '1'; }, 3000);
+
+  /* t=45s — il devient violet, en 8s. Tu peux ne pas le remarquer. */
+  setTimeout(function () { dot.style.color = 'rgba(180,140,255,.09)'; }, 45000);
+
+  /* t=12s — l'unique consigne. Elle s'efface seule a t=32s. */
+  setTimeout(function () { note.classList.add('on'); }, 12000);
+  setTimeout(function () { note.classList.remove('on'); }, 32000);
+
+  /* Cliquer ne fait rien, sauf compter. Neuf mots, pas dix. */
+  var n = 0;
+  document.addEventListener('click', function () {
+    if (n < 9) n++;
+    dot.textContent = new Array(n).join('\u00b7 ') + '\u00b7';
+  });
+
+  /* La seule horloge : l'onglet. */
+  setInterval(function () {
+    var s = Math.floor((Date.now() - t0) / 1000);
+    document.title = s + ' \u2014 RIEN';
+  }, 1000);
+})();
+</script>
+</body>
+</html>
