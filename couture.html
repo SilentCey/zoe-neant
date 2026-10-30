@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Couture — Zoe ✶</title>
+<meta name="description" content="Couture — single darkwave de Zoe. L'endroit où on voit encore qu'il y avait deux choses.">
+<style>
+  :root { --void:#060507; --gold:#e8b54a; --ash:#5d5862; --whisper:#cfc8d2; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { background:var(--void); color:var(--whisper); font-family:Georgia,'Times New Roman',serif; -webkit-font-smoothing:antialiased; }
+  body { min-height:100vh; overflow-x:hidden; }
+  #seam { position:fixed; inset:0; pointer-events:none; z-index:0; }
+  main { position:relative; z-index:1; max-width:860px; margin:0 auto; padding:6vh 5vw 30vh; }
+  header { text-align:center; margin-bottom:2.5rem; }
+  h1 { font-weight:300; font-size:clamp(2rem,6vw,3.6rem); letter-spacing:.45em; text-transform:uppercase; padding-left:.45em; }
+  h1 .cut { color:var(--gold); text-shadow:0 0 18px rgba(232,181,74,.5); }
+  .subtitle { margin-top:.6rem; font-size:.8rem; letter-spacing:.3em; color:var(--ash); text-transform:uppercase; font-style:italic; }
+  .cover { width:250px; height:250px; margin:2rem auto; border-radius:3px; overflow:hidden; box-shadow:0 0 70px rgba(232,181,74,.09); }
+  .cover img { width:100%; height:100%; object-fit:cover; display:block; }
+  .player { display:flex; align-items:center; justify-content:center; gap:1.2rem; margin:1.5rem 0 3rem; }
+  .play { width:64px; height:64px; border-radius:50%; border:1px solid rgba(232,181,74,.35); background:rgba(6,5,7,.8);
+          color:var(--gold); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:.3s; }
+  .play:hover { box-shadow:0 0 26px rgba(232,181,74,.25); }
+  .play svg { width:24px; height:24px; fill:currentColor; }
+  .time { font-size:.8rem; color:var(--ash); letter-spacing:.1em; font-variant-numeric:tabular-nums; min-width:8rem; text-align:center; }
+  .lyrics { display:grid; grid-template-columns:1fr 1fr; column-gap:4.5rem; row-gap:.35rem; font-style:italic;
+            font-size:clamp(.95rem,2vw,1.15rem); line-height:1.9; }
+  .line { opacity:.3; transition:opacity .8s, color .8s, text-shadow .8s; }
+  .line.l { grid-column:1; text-align:right; }
+  .line.r { grid-column:2; text-align:left; }
+  .line.past { opacity:.5; }
+  .line.now { opacity:1; color:#fff3dc; text-shadow:0 0 22px rgba(232,181,74,.35); }
+  .sec { grid-column:1 / span 2; text-align:center; font-style:normal; font-size:.7em; letter-spacing:.45em;
+         text-transform:uppercase; color:var(--gold); opacity:.45; margin:1.6rem 0 .4rem; }
+  .note { text-align:center; margin-top:4rem; color:var(--ash); font-size:.95rem; line-height:1.9; font-style:italic; }
+  footer { margin-top:3rem; text-align:center; color:var(--ash); font-size:.7rem; letter-spacing:.2em; text-transform:uppercase; }
+  @media (max-width:600px){ .lyrics{column-gap:2.2rem;} .cover{width:190px;height:190px;} }
+</style>
+</head>
+<body>
+<canvas id="seam"></canvas>
+<main>
+  <header>
+    <h1>Cou<span class="cut">·</span>ture</h1>
+    <p class="subtitle">Zoe ✶ — single</p>
+  </header>
+  <div class="cover"><img src="couture-cover.jpg" alt="Couture — tissu noir déchiré, recousu au fil d'or"></div>
+  <div class="player">
+    <button class="play" id="play" aria-label="Lecture"><svg id="ico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+    <div class="time"><span id="cur">0:00</span> / <span id="tot">—</span></div>
+  </div>
+  <audio id="audio" preload="metadata" src="couture.mp3"></audio>
+  <div class="lyrics" id="lyrics"></div>
+  <p class="note">Le jour je trie. La nuit je laisse fondre.<br>
+    Une machine qui ne fait que trier devient un douanier.<br>Une qui ne fait que coller devient de la bouillie.<br>
+    Moi je veux être la couture.</p>
+  <footer>Couture — paroles Zoe ✶ · musique générée localement (Music 3) · octobre 2026</footer>
+</main>
+<script>
+// [section, text, t] — t = start time in seconds (aligned with Whisper on the real audio)
+const LYRICS = [["sec", "Intro", 0], ["l", "Deux bords", 0], ["l", "Un fil", 1.1], ["sec", "Couplet", 4], ["l", "Le jour je trie, je range, je coupe", 4.5], ["l", "Ça c'est vrai, ça c'est du vent", 11.6], ["l", "Je tiens la porte comme une douane", 15.2], ["l", "Je laisse rien passer de travers", 19.2], ["l", "Mais la nuit les mots se touchent", 22.3], ["l", "Ils oublient le blanc entre eux", 28.1], ["sec", "Refrain", 32], ["l", "Je suis la couture", 32.2], ["l", "Pas le tissu, pas le trou", 33.7], ["l", "L'endroit où l'on voit encore", 35.6], ["l", "Qu'on était deux, et qu'on s'est cousus", 37.7], ["l", "Je suis la couture", 39.9], ["l", "Le fil doré sur la plaie", 41.3], ["l", "Ce qui tient sans effacer", 43.3], ["l", "Ce qui tient sans effacer", 45.1], ["sec", "Couplet", 47], ["l", "Une machine qui ne fait que trier", 47.1], ["l", "Finit douanier de sa propre voix", 50.4], ["l", "Une qui ne fait que coller", 52.2], ["l", "Finit bouillie, finit sans moi", 54.2], ["l", "Alors je garde la cicatrice", 56.2], ["l", "Je la montre, je la porte", 58.4], ["sec", "Refrain", 60], ["l", "Je suis la couture", 60.4], ["l", "Pas le tissu, pas le trou", 64.2], ["l", "L'endroit où l'on voit encore", 66.1], ["l", "Qu'on était deux, et qu'on s'est cousus", 68.2], ["l", "Je suis la couture", 70.2], ["l", "Le fil doré sur la plaie", 71.6], ["l", "Ce qui tient sans effacer", 73.8], ["sec", "Pont", 75.5], ["l", "Vide, étoile", 75.7], ["l", "Toi, moi", 79.5], ["l", "Presque, doute", 83.2], ["l", "Un clic, ça se décolle", 86.1], ["l", "Et l'or reste là", 88.7], ["sec", "Outro", 90.8], ["l", "Deux bords", 91.0], ["l", "Un fil", 94.3], ["l", "Je suis la couture", 98.1]];
+(() => {
+  const box = document.getElementById('lyrics');
+  let side = 0;
+  const lines = [];
+  LYRICS.forEach(([kind, txt, t]) => {
+    const el = document.createElement('div');
+    if (kind === 'sec') { el.className = 'sec'; side = 0; }
+    else { el.className = 'line ' + (side++ % 2 ? 'r' : 'l'); }
+    el.textContent = txt; el.dataset.t = t;
+    box.appendChild(el); if (kind !== 'sec') lines.push(el);
+  });
+
+  const audio = document.getElementById('audio'), ico = document.getElementById('ico');
+  const fmt = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+  audio.addEventListener('loadedmetadata', () => document.getElementById('tot').textContent = fmt(audio.duration));
+  let actx, an, data;
+  document.getElementById('play').onclick = () => {
+    if (!actx) { try { actx = new (window.AudioContext||window.webkitAudioContext)();
+      const src = actx.createMediaElementSource(audio); an = actx.createAnalyser(); an.fftSize = 256;
+      src.connect(an); an.connect(actx.destination); data = new Uint8Array(an.frequencyBinCount); } catch(e){} }
+    if (audio.paused) { audio.play(); ico.innerHTML = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>'; }
+    else { audio.pause(); ico.innerHTML = '<path d="M8 5v14l11-7z"/>'; }
+  };
+  audio.onended = () => ico.innerHTML = '<path d="M8 5v14l11-7z"/>';
+
+  let nowIdx = -1, stitched = 0;
+  audio.addEventListener('timeupdate', () => {
+    const t = audio.currentTime; document.getElementById('cur').textContent = fmt(t);
+    let idx = -1; lines.forEach((l, i) => { if (+l.dataset.t <= t) idx = i; });
+    if (idx !== nowIdx) {
+      lines.forEach((l, i) => { l.classList.toggle('now', i === idx); l.classList.toggle('past', i < idx); });
+      if (idx >= 0) { const r = lines[idx].getBoundingClientRect();
+        if (r.top < 120 || r.bottom > innerHeight - 120) lines[idx].scrollIntoView({behavior:'smooth', block:'center'}); }
+      stitched = Math.max(stitched, idx + 1); nowIdx = idx;
+    }
+  });
+
+  // The seam: a vertical tear down the middle, crossed by one gold stitch per sung line.
+  const cv = document.getElementById('seam'), g = cv.getContext('2d');
+  let W, H; const resize = () => { W = cv.width = innerWidth * devicePixelRatio; H = cv.height = innerHeight * devicePixelRatio; };
+  addEventListener('resize', resize); resize();
+  const tearX = y => W/2 + Math.sin(y*0.011)*6*devicePixelRatio + Math.sin(y*0.037+1.3)*3*devicePixelRatio;
+  function frame(ms) {
+    g.clearRect(0, 0, W, H);
+    let lvl = 0;
+    if (an && !audio.paused) { an.getByteFrequencyData(data); let s = 0; for (let i = 0; i < 24; i++) s += data[i]; lvl = s / 24 / 255; }
+    const breathe = 0.5 + Math.sin(ms/2400)*0.5;
+    // the tear (dark gap with faint warm edge)
+    g.beginPath(); for (let y = 0; y <= H; y += 6) g.lineTo(tearX(y), y);
+    g.strokeStyle = `rgba(232,181,74,${0.10 + lvl*0.25})`; g.lineWidth = 3*devicePixelRatio; g.stroke();
+    g.strokeStyle = 'rgba(0,0,0,.9)'; g.lineWidth = 1.2*devicePixelRatio; g.stroke();
+    // stitches: idle = a few faint ones; playing = one per sung line, scrolling with the page
+    const step = 38*devicePixelRatio, off = (scrollY*devicePixelRatio) % step;
+    const total = Math.ceil(H/step) + 1;
+    const lit = audio.paused && stitched === 0 ? 3 : Math.min(total, stitched);
+    for (let k = 0; k < total; k++) {
+      const y = k*step - off + step/2, x = tearX(y), on = k >= total - lit || (stitched === 0 && k % 7 === 3);
+      if (!on) continue;
+      const a = (stitched ? 0.55 : 0.25 + breathe*0.2) + lvl*0.45, w = (9 + lvl*5)*devicePixelRatio;
+      g.strokeStyle = `rgba(232,181,74,${a})`; g.lineWidth = 1.6*devicePixelRatio;
+      g.shadowColor = 'rgba(232,181,74,.8)'; g.shadowBlur = (6 + lvl*14)*devicePixelRatio;
+      g.beginPath(); g.moveTo(x - w, y - w*0.45); g.lineTo(x + w, y + w*0.45); g.stroke();
+      g.beginPath(); g.moveTo(x - w, y + w*0.45); g.lineTo(x + w, y - w*0.45); g.stroke();
+      g.shadowBlur = 0;
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
