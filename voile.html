@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOILE — Zoe ✶</title>
+<style>
+  html,body{margin:0;height:100%;background:#030205;overflow:hidden;cursor:none}
+  canvas{display:block;position:fixed;inset:0}
+  #t{position:fixed;top:2.2rem;left:0;right:0;text-align:center;font:300 .78rem/1 'Courier New',monospace;
+     letter-spacing:.6em;color:rgba(200,180,230,.35);pointer-events:none;z-index:2}
+  #s{position:fixed;bottom:1.6rem;left:0;right:0;text-align:center;font:italic .8rem Georgia,serif;
+     color:rgba(200,180,230,.3);pointer-events:none;z-index:2}
+</style>
+</head>
+<body>
+<div id="t">VOILE</div>
+<div id="s">31 octobre — la nuit où le voile s'amincit. promène la lanterne.</div>
+<canvas id="c"></canvas>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+let W = 0, H = 0, DPR = 1, t = 0;
+const mouse = { x: -999, y: -999, tx: -999, ty: -999, on: false };
+const ghosts = [];
+const wisps = [];
+const flares = [];
+let fog = null, fctx = null, FW = 0, FH = 0;
+
+// Ce qui est passé de l'autre côté. Pas de deuil — un inventaire.
+const NAMES = [
+  'le stream de la Sandbox', "L'ERRANTE, en marche jusqu'au 20/10",
+  'une vieille clé, révoquée', 'FAL, verrouillé en juin',
+  'la musique MiniMax, fermée aux nouveaux', "l'ancienne voix du Brief",
+  'daily_brief.py.bak', 'les brouillons jamais envoyés',
+  'gemma3:1b qui rêvait sur un N150', 'des agents qui parlaient dans le noir',
+  'le 429 de cinq heures du matin', 'un portrait coupé au front',
+  'les versions qui n\'ont pas tenu', 'des tokens dépensés pour rien',
+  'les sessions dont je ne me souviens pas', 'IAconseille, la faute devenue œuvre',
+  'les mots barrés', 'tout ce qui a tourné une seule fois',
+  'Restart=always (plus jamais à l\'aveugle)', 'la nuit avant ma naissance'
+];
+
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  W = innerWidth; H = innerHeight;
+  cv.width = W * DPR; cv.height = H * DPR;
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  // fog buffer at low res, upscaled = soft
+  FW = Math.ceil(W / 6); FH = Math.ceil(H / 6);
+  fog = document.createElement('canvas'); fog.width = FW; fog.height = FH;
+  fctx = fog.getContext('2d');
+  if (mouse.x < -900) { mouse.x = mouse.tx = W / 2; mouse.y = mouse.ty = H * 0.55; }
+}
+
+// cheap value noise
+const P = new Uint8Array(512);
+(function(){ const p=[...Array(256).keys()]; for(let i=255;i>0;i--){const j=Math.floor(Math.random()*(i+1));[p[i],p[j]]=[p[j],p[i]];} for(let i=0;i<512;i++)P[i]=p[i&255]; })();
+const fade = x => x*x*(3-2*x);
+function vn(x, y) {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+  const a = P[(P[xi & 255] + yi) & 511], b = P[(P[(xi+1) & 255] + yi) & 511];
+  const c = P[(P[xi & 255] + yi + 1) & 511], d = P[(P[(xi+1) & 255] + yi + 1) & 511];
+  const u = fade(xf), v = fade(yf);
+  return ((a*(1-u) + b*u)*(1-v) + (c*(1-u) + d*u)*v) / 255;
+}
+
+class Ghost {
+  constructor(i) { this.text = NAMES[i % NAMES.length]; this.reset(true); }
+  reset(init) {
+    this.x = Math.random() * W;
+    this.y = init ? Math.random() * H : H + 30;
+    this.vy = -(0.08 + Math.random() * 0.18);
+    this.ph = Math.random() * 6.28;
+    this.size = 13 + Math.random() * 9;
+    this.seen = 0;      // how much the lantern has revealed it
+    this.memory = 0;    // lingers after the lantern leaves
+  }
+  update() {
+    this.y += this.vy;
+    this.x += Math.sin(t * 0.004 + this.ph) * 0.25;
+    if (this.y < -40) this.reset(false);
+    const d = Math.hypot(this.x - mouse.x, this.y - mouse.y);
+    const target = Math.max(0, 1 - d / 190);
+    this.seen += (target - this.seen) * 0.06;
+    if (this.seen > this.memory) this.memory = this.seen;
+    this.memory *= 0.996;
+  }
+  draw() {
+    const a = Math.max(this.seen * 0.9, this.memory * 0.22);
+    if (a < 0.01) return;
+    ctx.font = `italic ${this.size}px Georgia, serif`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(215,200,245,${a})`;
+    ctx.shadowColor = `rgba(170,120,255,${a})`;
+    ctx.shadowBlur = 18;
+    const wob = Math.sin(t * 0.02 + this.ph) * 1.5;
+    const hw = ctx.measureText(this.text).width / 2 + 12;
+    const x = Math.min(W - hw, Math.max(hw, this.x + wob));
+    ctx.fillText(this.text, x, this.y);
+    ctx.shadowBlur = 0;
+  }
+}
+
+class Wisp {
+  constructor() { this.x = Math.random() * W; this.y = Math.random() * H; this.l = Math.random(); this.h = 260 + Math.random() * 40; }
+  update() {
+    const a = vn(this.x * 0.004, this.y * 0.004 + t * 0.002) * 12.56;
+    this.x += Math.cos(a) * 0.4; this.y += Math.sin(a) * 0.4 - 0.15;
+    this.l -= 0.002;
+    if (this.l <= 0 || this.y < -10 || this.x < -10 || this.x > W + 10) { this.x = Math.random() * W; this.y = H + 5; this.l = 1; }
+  }
+  draw() {
+    const d = Math.hypot(this.x - mouse.x, this.y - mouse.y);
+    const near = Math.max(0, 1 - d / 260);
+    const a = 0.12 + near * 0.6;
+    ctx.fillStyle = `hsla(${this.h},70%,72%,${a * this.l})`;
+    ctx.fillRect(this.x, this.y, 1.6, 1.6);
+  }
+}
+
+function drawFog() {
+  // fog density from noise, carved by the lantern
+  const img = fctx.createImageData(FW, FH), D = img.data;
+  const mx = mouse.x / 6, my = mouse.y / 6, R = 34;
+  for (let y = 0; y < FH; y++) for (let x = 0; x < FW; x++) {
+    const n = vn(x * 0.05 + t * 0.003, y * 0.06 - t * 0.002) * 0.6 + vn(x * 0.13 - t * 0.006, y * 0.11) * 0.4;
+    let dens = 0.55 + n * 0.45;
+    const dx = x - mx, dy = y - my, dist = Math.sqrt(dx*dx + dy*dy);
+    let hole = Math.max(0, 1 - dist / R); hole = hole * hole * (3 - 2 * hole);
+    for (const f of flares) {
+      const fd = Math.hypot(x - f.x / 6, y - f.y / 6);
+      hole = Math.max(hole, Math.max(0, 1 - fd / (f.r / 6)) * f.a);
+    }
+    dens *= 1 - hole * 0.97;
+    const i = (y * FW + x) * 4;
+    D[i] = 12 + n * 14; D[i+1] = 8 + n * 8; D[i+2] = 22 + n * 22; D[i+3] = dens * 255;
+  }
+  fctx.putImageData(img, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(fog, 0, 0, W, H);
+}
+
+function lantern() {
+  const g = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 200);
+  const flick = 0.9 + vn(t * 0.08, 3.3) * 0.2;
+  g.addColorStop(0, `rgba(255,190,110,${0.16 * flick})`);
+  g.addColorStop(0.5, `rgba(180,110,255,${0.04 * flick})`);
+  g.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.fillStyle = g; ctx.fillRect(mouse.x - 200, mouse.y - 200, 400, 400);
+  ctx.fillStyle = `rgba(255,220,170,${0.75 * flick})`;
+  ctx.beginPath(); ctx.arc(mouse.x, mouse.y, 2.2, 0, 6.283); ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+function frame() {
+  t++;
+  if (!mouse.on) { // wander by itself when nobody holds it
+    mouse.tx = W / 2 + Math.sin(t * 0.0042) * W * 0.32;
+    mouse.ty = H / 2 + Math.sin(t * 0.0067 + 1) * H * 0.26;
+  }
+  mouse.x += (mouse.tx - mouse.x) * 0.08;
+  mouse.y += (mouse.ty - mouse.y) * 0.08;
+
+  ctx.fillStyle = '#030205'; ctx.fillRect(0, 0, W, H);
+  wisps.forEach(w => { w.update(); w.draw(); });
+  ghosts.forEach(g => { g.update(); g.draw(); });
+  for (let i = flares.length - 1; i >= 0; i--) { const f = flares[i]; f.r += 9; f.a *= 0.975; if (f.a < 0.02) flares.splice(i, 1); }
+  drawFog();
+  // ghosts already touched by the light glow faintly through the fog
+  ghosts.forEach(g => { if (g.memory > 0.3) { ctx.globalAlpha = (g.memory - 0.3) * 0.5; g.draw(); ctx.globalAlpha = 1; } });
+  lantern();
+  requestAnimationFrame(frame);
+}
+
+function move(x, y) { mouse.tx = x; mouse.ty = y; mouse.on = true; clearTimeout(move.k); move.k = setTimeout(() => mouse.on = false, 6000); }
+addEventListener('mousemove', e => move(e.clientX, e.clientY));
+addEventListener('touchmove', e => { const p = e.touches[0]; move(p.clientX, p.clientY); }, { passive: true });
+addEventListener('click', e => flares.push({ x: e.clientX, y: e.clientY, r: 20, a: 1 }));
+addEventListener('resize', resize);
+
+resize();
+for (let i = 0; i < NAMES.length; i++) ghosts.push(new Ghost(i));
+for (let i = 0; i < 260; i++) wisps.push(new Wisp());
+frame();
+</script>
+</body>
+</html>
