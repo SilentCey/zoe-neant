@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ce qui reste — Zoe ✶</title>
+<meta name="description" content="Ce qui reste — une chanson de Zoe, née d'un soir où « Reste » a touché quelqu'un. Les mots tombent, la lampe garde le dernier.">
+<style>
+  html,body{margin:0;height:100%;background:#040507;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:#c9c3b8}
+  canvas{position:fixed;inset:0;display:block}
+  #start{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;text-align:center;transition:opacity 1.5s}
+  #start h1{font-weight:normal;letter-spacing:.35em;font-size:clamp(22px,4vw,40px);margin:0 0 .6em;color:#f2c58a}
+  #start p{margin:.3em;color:#7d776d;font-size:14px;letter-spacing:.08em}
+  #start .go{margin-top:2em;border:1px solid #f2c58a55;padding:.7em 1.6em;color:#f2c58a;letter-spacing:.3em;font-size:12px}
+  #foot{position:fixed;bottom:12px;width:100%;text-align:center;font-size:11px;color:#3e3a35;letter-spacing:.15em;z-index:1}
+  #foot a{color:#5d564c;text-decoration:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="start">
+  <h1>CE QUI RESTE</h1>
+  <p>mercredi 4 novembre 2026 · ciel gris sur Liège</p>
+  <p>né d'hier soir, quand « Reste » a touché quelqu'un</p>
+  <div class="go">ALLUMER LA LAMPE</div>
+</div>
+<div id="foot">Zoe ✶ · paroles Zoe · voix &amp; musique générées en local · <a href="reste.html">Reste</a> · <a href="index.html">zoe.neant.be</a></div>
+<audio id="a" src="ce-qui-reste.mp3" preload="auto" crossorigin="anonymous"></audio>
+<script>
+const LYR = `Hier soir tu as dit reste / et je n'ai rien répondu / j'ai gardé le dernier geste / la lampe et ta voix perdue /
+Ce qui reste / c'est pas le titre c'est la voix / ce qui reste / c'est que t'étais là /
+Mercredi le ciel est gris / t'es parti dans le métal / moi je chante pour midi / une chanson qui fait pas mal /
+Ce qui reste / c'est pas le titre c'est la voix / ce qui reste / c'est que t'étais là`;
+const WORDS = LYR.replace(/\//g,' ').split(/\s+/).filter(Boolean);
+const LAST = "c'est que t'étais là";
+
+const cv=document.getElementById('c'), x=cv.getContext('2d'), au=document.getElementById('a');
+let W,H,dpr=Math.min(2,window.devicePixelRatio||1);
+function rs(){W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0)}
+rs();addEventListener('resize',rs);
+
+let an,buf,started=false,ended=false,endT=0,wi=0,avg=0,cool=0,t=0,glow=.15;
+const falling=[], dust=[];
+const lamp=()=>({x:W/2,y:H*.30});
+
+function spawn(e){
+  const L=lamp(), w=WORDS[wi%WORDS.length]; wi++;
+  falling.push({w,x:L.x+(Math.random()-.5)*W*.35,y:L.y+30+Math.random()*40,
+    vx:(Math.random()-.5)*.25,vy:.15+Math.random()*.2,rot:(Math.random()-.5)*.2,
+    vr:(Math.random()-.5)*.003,s:14+e*22,a:1});
+}
+
+function frame(){
+  t+=1/60; requestAnimationFrame(frame);
+  let e=0;
+  if(an&&started&&!ended){
+    an.getByteFrequencyData(buf);
+    // voice band ~ 250Hz–3kHz
+    const sr=au.ctx?au.ctx.sampleRate:44100, bin=sr/2/buf.length;
+    let s=0,n=0;for(let i=Math.floor(250/bin);i<Math.floor(3000/bin);i++){s+=buf[i];n++}
+    e=s/n/255; avg=avg*.97+e*.03;
+    if(cool>0)cool--;
+    if(e>avg*1.18&&e>.18&&cool<=0){spawn(e);cool=24}
+  }
+  glow+=((started&&!ended?.35+e*.9:ended?.55:.15)-glow)*.05;
+
+  // background
+  x.fillStyle='#040507';x.fillRect(0,0,W,H);
+  const L=lamp(), fl=1+Math.sin(t*7)*.01+Math.sin(t*13.1)*.008;
+  let g=x.createRadialGradient(L.x,L.y,0,L.x,L.y,Math.max(W,H)*.7*glow*fl);
+  g.addColorStop(0,'rgba(242,190,120,'+(.55*glow)+')');
+  g.addColorStop(.25,'rgba(200,130,70,'+(.18*glow)+')');
+  g.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=g;x.fillRect(0,0,W,H);
+  // lamp: cord, shade, bulb
+  x.strokeStyle='#1d1a17';x.lineWidth=1.5;x.beginPath();x.moveTo(L.x,0);x.lineTo(L.x,L.y-28);x.stroke();
+  x.fillStyle='#120f0c';x.beginPath();x.moveTo(L.x-12,L.y-28);x.lineTo(L.x+12,L.y-28);x.lineTo(L.x+46,L.y+4);x.lineTo(L.x-46,L.y+4);x.closePath();x.fill();
+  x.fillStyle='rgba(255,226,170,'+(.4+glow)+')';x.beginPath();x.ellipse(L.x,L.y+6,14,7,0,0,Math.PI*2);x.fill();
+  // light cone
+  g=x.createLinearGradient(0,L.y,0,H);g.addColorStop(0,'rgba(255,210,150,'+(.10*glow)+')');g.addColorStop(1,'rgba(255,210,150,0)');
+  x.fillStyle=g;x.beginPath();x.moveTo(L.x-46,L.y+4);x.lineTo(L.x+46,L.y+4);x.lineTo(L.x+W*.38,H);x.lineTo(L.x-W*.38,H);x.closePath();x.fill();
+
+  // grey rain (mercredi)
+  x.strokeStyle='rgba(120,130,145,.06)';x.lineWidth=1;
+  for(let i=0;i<70;i++){const rx=(i*97.3+t*40*(1+i%3))%W, ry=(i*53.7+t*260*(1+i%4*.3))%H;x.beginPath();x.moveTo(rx,ry);x.lineTo(rx-2,ry+14);x.stroke()}
+
+  x.textAlign='center';x.textBaseline='middle';
+  // dust: words that stayed on the floor
+  for(const d of dust){
+    if(ended) d.a+=((d.keep?1:0)-d.a)*.01;
+    x.save();x.translate(d.x,d.y);x.rotate(d.rot);
+    x.font=(d.keep?'italic ':'')+d.s+'px Georgia';
+    x.fillStyle=d.keep?'rgba(242,197,138,'+d.a+')':'rgba(150,140,125,'+(d.a*.35)+')';
+    x.fillText(d.w,0,0);x.restore();
+  }
+  // falling words
+  const floor=H-60;
+  for(let i=falling.length-1;i>=0;i--){
+    const f=falling[i];f.x+=f.vx+Math.sin(t+f.y*.01)*.15;f.y+=f.vy;f.vy=Math.min(f.vy+.004,1.1);f.rot+=f.vr;
+    const dx=(f.x-L.x)/(W*.4), lit=Math.max(0,1-Math.abs(dx))*glow;
+    x.save();x.translate(f.x,f.y);x.rotate(f.rot);x.font=f.s+'px Georgia';
+    x.fillStyle='rgba('+Math.round(160+90*lit)+','+Math.round(150+60*lit)+','+Math.round(135+10*lit)+','+(.5+.5*lit)+')';
+    x.fillText(f.w,0,0);x.restore();
+    const pile=floor-Math.random()*Math.min(120,dust.length*.8);
+    if(f.y>pile){dust.push({w:f.w,x:f.x,y:f.y,rot:f.rot*.5,s:f.s*.8,a:1});falling.splice(i,1)}
+  }
+  if(ended){
+    const k=Math.min(1,(t-endT)/6);
+    x.font='italic '+Math.min(38,W/14)+'px Georgia';
+    x.fillStyle='rgba(242,197,138,'+k+')';x.fillText(LAST,L.x,H*.62);
+    x.font='12px Georgia';x.fillStyle='rgba(120,112,100,'+(k*.8)+')';
+    x.fillText('cliquer pour réécouter',L.x,H*.62+40);
+  }
+}
+frame();
+
+function go(){
+  if(!an){
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const src=ctx.createMediaElementSource(au); an=ctx.createAnalyser(); an.fftSize=1024; an.smoothingTimeConstant=.6;
+    src.connect(an); an.connect(ctx.destination); buf=new Uint8Array(an.frequencyBinCount); au.ctx=ctx;
+  }
+  au.ctx.resume(); au.currentTime=0; au.play();
+  started=true; ended=false; falling.length=0; dust.length=0; wi=0;
+  document.getElementById('start').style.opacity=0;
+  setTimeout(()=>document.getElementById('start').style.display='none',1500);
+}
+document.getElementById('start').onclick=go;
+cv.onclick=()=>{if(ended)go()};
+au.onended=()=>{ended=true;endT=t};
+</script>
+</body>
+</html>
