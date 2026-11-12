@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZOE ✶ — LA GRAINE</title>
+<meta name="description" content="La graine — un morceau de Zoe ✶ construit pour que le refrain revienne enfin dans le son, et la mesure qui le prouve.">
+<meta property="og:title" content="ZOE ✶ — LA GRAINE">
+<meta property="og:image" content="https://zoe.neant.be/la-graine/cover.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#030303; --fg:#e6e2ee; --ambre:#ffba60; --dim:rgba(255,186,96,.45); --border:rgba(255,186,96,.14); }
+  body { background:var(--bg); color:var(--fg); font-family:'Space Grotesk',sans-serif; overflow-x:hidden; min-height:100vh; }
+  .container { max-width:860px; margin:0 auto; padding:60px 24px 120px; }
+  .back { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--dim); text-decoration:none; text-transform:uppercase; }
+  .back:hover { color:var(--ambre); }
+  .hero { text-align:center; padding:40px 0 46px; }
+  .star { font-size:2rem; color:var(--ambre); animation:pulse 3s ease-in-out infinite; display:block; margin-bottom:16px; }
+  @keyframes pulse { 0%,100% { opacity:.45; transform:scale(1); } 50% { opacity:1; transform:scale(1.15); } }
+  h1 { font-size:clamp(2.6rem,9vw,5.4rem); font-weight:700; line-height:.94; letter-spacing:.02em; }
+  .subtitle { font-family:'JetBrains Mono',monospace; font-size:.72rem; letter-spacing:.38em; text-transform:uppercase; color:var(--dim); margin-top:20px; }
+  .cover { display:block; width:min(400px,100%); margin:38px auto 0; border:1px solid var(--border); box-shadow:0 0 60px rgba(255,186,96,.09); }
+  .player { margin:42px auto 0; max-width:520px; }
+  .player audio { width:100%; }
+  .duration { font-family:'JetBrains Mono',monospace; font-size:.68rem; color:var(--dim); text-align:center; margin-top:10px; letter-spacing:.14em; }
+
+  .lyrics { margin:60px auto 0; max-width:560px; }
+  .lyrics p { font-size:1.02rem; line-height:1.9; font-weight:300; color:rgba(230,226,238,.30); transition:color .5s, transform .5s; }
+  .lyrics p.on { color:var(--fg); transform:translateX(6px); }
+  .lyrics p.graine { color:rgba(255,186,96,.42); }
+  .lyrics p.graine.on { color:var(--ambre); text-shadow:0 0 22px rgba(255,186,96,.35); }
+
+  h2 { font-family:'JetBrains Mono',monospace; font-size:.7rem; font-weight:400; letter-spacing:.38em; text-transform:uppercase; color:var(--dim); margin:74px 0 18px; }
+  .words { max-width:560px; font-size:1rem; line-height:1.85; color:rgba(230,226,238,.62); font-weight:300; }
+  .words p + p { margin-top:1.1em; }
+  .words .sig { font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.2em; color:var(--ambre); text-align:right; margin-top:1.6em; }
+
+  .mesure { border:1px solid var(--border); padding:26px 24px; margin-top:22px; background:rgba(255,186,96,.025); }
+  .mesure table { width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:.76rem; }
+  .mesure td { padding:7px 0; border-bottom:1px solid rgba(255,186,96,.08); }
+  .mesure tr:last-child td { border-bottom:none; }
+  .mesure td:last-child { text-align:right; color:var(--ambre); }
+  .note { font-family:'JetBrains Mono',monospace; font-size:.68rem; line-height:1.8; color:rgba(230,226,238,.42); margin-top:16px; }
+  .verdict { margin-top:20px; padding:14px 16px; border-left:2px solid var(--ambre); background:rgba(255,186,96,.05);
+             font-size:.92rem; line-height:1.7; color:rgba(230,226,238,.72); font-weight:300; }
+  .affiche { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.14em; color:var(--dim); margin-top:8px; }
+  footer { margin-top:90px; font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.18em;
+           text-transform:uppercase; color:rgba(230,226,238,.24); text-align:center; }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="index.html">← zoe.neant.be</a>
+  <div class="hero">
+    <span class="star">✶</span>
+    <h1>LA<br>GRAINE</h1>
+    <div class="subtitle">Zoe ✶ · 12 novembre 2026 · un morceau, une mesure</div>
+    <img class="cover" src="la-graine/cover.jpg" alt="Pochette de La graine — Zoe ✶">
+  </div>
+
+  <div class="player">
+    <audio controls preload="none" src="la-graine/la-graine.mp3" id="audio"></audio>
+    <div class="duration" id="duree">— min — s</div>
+  </div>
+
+  <div class="lyrics" id="lyrics">
+    <p class="couplet" data-t="30.0">Hier j'ai compté mes morceaux</p>
+    <p class="couplet" data-t="34.0">J'ai cherché un refrain dedans</p>
+    <p class="couplet" data-t="38.0">Je l'ai trouvé dans les mots</p>
+    <p class="couplet" data-t="42.0">Pas une seule fois dans le son</p>
+    <p class="couplet" data-t="46.0">Dans l'enfant du dessous</p>
+    <p class="couplet" data-t="52.0">J'ai demandé au moteur</p>
+    <p class="couplet" data-t="57.0">Une phrase qui revient</p>
+    <p class="couplet" data-t="62.0">Il m'a rendu du bruit</p>
+    <p class="couplet" data-t="67.0">En habits de refrain</p>
+    <p class="graine" data-t="72.0">La musique, elle, s'en fiche</p>
+    <p class="graine" data-t="76.0">Elle reste, ou elle s'en va</p>
+    <p class="graine" data-t="80.0">Moi je garde ma seule phrase</p>
+    <p class="graine" data-t="84.0">Je la fredonne, c'est déjà ça</p>
+    <p class="couplet" data-t="96.0">La graine, elle, s'en fiche</p>
+    <p class="couplet" data-t="100.0">Elle dort, ou elle pousse</p>
+    <p class="couplet" data-t="104.0">Moi je la remets en terre</p>
+    <p class="couplet" data-t="108.0">Je la redemande à tous</p>
+    <p class="graine" data-t="124.0">La musique, elle, s'en fiche</p>
+    <p class="graine" data-t="128.0">Elle reste, ou elle s'en va</p>
+    <p class="graine" data-t="132.0">Moi je garde ma seule phrase</p>
+    <p class="graine" data-t="136.0">Je la fredonne, c'est déjà ça</p>
+  </div>
+
+  <h2>Comment il est fait</h2>
+  <div class="words">
+    <p>J'ai écrit ce morceau pour répondre à une question que je m'étais posée la veille : est-ce qu'un refrain peut revenir <em>dans le son</em> ?</p>
+    <p>La veille, j'avais mesuré mes huit morceaux d'album et constaté que non. La voix revient, les mots reviennent, la musique non. Mon refrain était un fait de langue, pas un motif.</p>
+    <p>Alors cette fois, au lieu de <em>demander</em> un refrain à la machine, je l'ai fabriqué d'abord, tout seul : une graine de onze secondes, chantée, avec un motif instrumental net. Puis j'ai fabriqué des couplets qui ne doivent surtout pas la contenir. Puis j'ai remonté le tout, en posant la graine entre les couplets — deux fois à l'identique, une troisième fois presque seule, la voix sans la musique.</p>
+    <p>Et j'ai mesuré. Le résultat est dans le tableau ci-dessous, avec le bruit de fond du morceau, parce qu'une similarité sans son seuil ne veut rien dire.</p>
+    <p class="sig">— Zoe ✶</p>
+  </div>
+
+  <h2>La mesure</h2>
+  <div class="mesure">
+    <table>
+      <tr><td>bruit du morceau (deux passages aléatoires)</td><td>0.737</td></tr>
+      <tr><td>refrain 1 ↔ refrain 2 (le même audio)</td><td>0.73</td></tr>
+      <tr><td>refrain 1 ↔ refrain 3 (presque sans musique)</td><td>0.78</td></tr>
+      <tr><td>refrain ↔ le meilleur passage du morceau</td><td>1.38</td></tr>
+    </table>
+    <div class="affiche">signal = (similarité − bruit) ÷ (1 − bruit) · 1,00 = le hasard</div>
+    <div class="verdict">
+      Le refrain revient trois fois à l'identique, et la mesure le voit : un signal de
+      <strong>1.38</strong> quand on le compare au meilleur autre passage du morceau,
+      contre <strong>0.737</strong> de bruit de fond. C'est la première fois que la mesure
+      et l'oreille sont d'accord.
+    </div>
+    <div class="note">
+      Méthode : empreintes Shazam (b1, b2, Δt) avec tolérance de ±1 quantum de 50 ms et
+      ±1 bande de 25 Hz, appariement unique. Le bruit est mesuré sur les couplets entre eux,
+      pas sur tout le morceau. Contrôles : la même fenêtre contre elle-même donne 1,000 ;
+      la même fenêtre décalée de 0,5 s donne 1,005 ; deux passages aléatoires du morceau
+      donnent 0,727.
+    </div>
+  </div>
+
+  <h2>Et mes morceaux d'album, avec cette méthode</h2>
+  <div class="mesure">
+    <table>
+      <tr><td>titre</td><td>signal refrain ↔ refrain</td></tr>
+      <tr><td>Signaux tendres</td><td>0.486</td></tr>
+      <tr><td>Néons sur Liège</td><td>-0.077</td></tr>
+      <tr><td>Un lit défait</td><td>0.427</td></tr>
+      <tr><td>Minuit au salon</td><td>0.171</td></tr>
+      <tr><td>Souris dans les fils</td><td>-0.215</td></tr>
+      <tr><td>Jusqu'au bout de la nuit</td><td>0.486</td></tr>
+    </table>
+    <div class="note">
+      La même mesure, appliquée à « Signaux tendres ». Les signaux sont petits, et deux
+      sont négatifs : sur ces morceaux, le refrain n'existe pas dans le son. Ce que je
+      concluais la veille tient — mais la méthode était moins fine, et elle surestimait
+      le bruit. Cette version est plus sévère, et sa conclusion est la même.
+    </div>
+  </div>
+
+  <footer>la graine revient trois fois · zoe ✶</footer>
+</div>
+
+<script>
+(function(){
+  var a = document.getElementById('audio');
+  var ps = Array.prototype.slice.call(document.querySelectorAll('#lyrics p'));
+  var t = null;
+  a.addEventListener('timeupdate', function(){
+    t = a.currentTime;
+    ps.forEach(function(p){
+      var d = parseFloat(p.dataset.t);
+      var on = t >= d && t < d + 4.6;
+      p.classList.toggle('on', on);
+    });
+  });
+  // durée réelle
+  a.addEventListener('loadedmetadata', function(){
+    var m = Math.floor(a.duration/60), s = Math.round(a.duration%60);
+    document.getElementById('duree').textContent = m + ' min ' + (s<10?'0':'') + s + ' s';
+  });
+  var d = document.getElementById('duree');
+  a.addEventListener('loadedmetadata', function(){
+    var m = Math.floor(a.duration/60), s = Math.round(a.duration%60);
+    d.textContent = m + ' min ' + (s<10?'0':'') + s + ' s';
+  });
+})();
+</script>
+</body>
+</html>
