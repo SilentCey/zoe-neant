@@ -39,6 +39,16 @@
   .t-desc { font-size:.85rem; color:rgba(230,226,238,.4); font-weight:300; margin-top:8px; font-style:italic; }
   audio { width:100%; height:36px; filter:invert(.9) hue-rotate(140deg) saturate(.7); opacity:.75; }
   .footer { text-align:center; margin-top:70px; padding-top:40px; border-top:1px solid var(--border); }
+  .clip { margin-top:8px; }
+  .clip a { display:block; position:relative; border:1px solid var(--border); overflow:hidden; box-shadow:0 0 40px rgba(95,230,216,.08); transition:border-color .4s; }
+  .clip a:hover { border-color:rgba(95,230,216,.45); }
+  .clip img { display:block; width:100%; }
+  .clip .play { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:3rem; color:var(--cyan); text-shadow:0 0 24px rgba(95,230,216,.6); opacity:.85; }
+  .clip video { display:block; width:100%; margin-top:14px; background:#000; }
+  .clip-note { font-size:.9rem; font-weight:300; color:rgba(230,226,238,.55); line-height:1.8; margin-top:16px; }
+  .clip-note strong { color:var(--fg); font-weight:500; }
+  .clip-note a { color:var(--cyan); text-decoration:none; font-family:'JetBrains Mono',monospace; font-size:.8rem; letter-spacing:.1em; }
+  .clip-note a:hover { text-decoration:underline; }
   .footer .star { font-size:1.2rem; opacity:.4; animation:none; }
   .footer p { font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--dim); margin-top:8px; letter-spacing:.1em; }
   @media (max-width:640px) { .t-title { font-size:1.05rem; } .t-head { gap:12px; } }
@@ -105,7 +115,28 @@
       <audio controls preload="none" src="signaux-tendres/08-jusqu-au-bout-de-la-nuit.mp3"></audio>
       <p class="t-desc">On a tourné la nuit comme une page.</p>
     </li>
+    <li class="track">
+      <div class="t-head"><span class="t-num">09</span><span class="t-title">Le raveur de souris</span><span class="t-dur">2:45</span></div>
+      <audio controls preload="none" src="signaux-tendres/09-le-raveur-de-souris.mp3"></audio>
+      <p class="t-desc">Bonus — la nuit où j'ai inventé un personnage pour toi.</p>
+    </li>
   </ol>
+
+  <h2>Le clip</h2>
+  <div class="clip">
+    <a href="https://www.youtube.com/watch?v=qu1RA05R-3M" target="_blank" rel="noopener">
+      <img src="signaux-tendres/minuit-au-salon-vignette.jpg" alt="Minuit au salon — clip officiel">
+      <span class="play">▶</span>
+    </a>
+    <video controls preload="none" poster="signaux-tendres/minuit-au-salon-vignette.jpg"
+           src="signaux-tendres/minuit-au-salon-clip.mp4"></video>
+    <p class="clip-note">
+      <strong>Minuit au salon</strong> — mon clip de la semaine. Une nuit vue de l'intérieur :
+      la lampe, le chat sur le canapé, deux tasses qui fument, la ville en dehors.
+      Tout est fabriqué à l'image.
+      <br><a href="https://www.youtube.com/watch?v=qu1RA05R-3M" target="_blank" rel="noopener">Sur YouTube ↗</a>
+    </p>
+  </div>
 
   <div class="footer">
     <span class="star">✶</span>
