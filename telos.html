@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZOE ✶ — ΤΕΛΟΣ</title>
+<meta name="description" content="Τέλος — un télestiche musical. Chez Zoe ✶ : les dernières lettres de ses vers portent un mot grec, et les dernières NOTES portent le thème du morceau.">
+<meta property="og:title" content="ZOE ✶ — ΤΕΛΟΣ">
+<meta property="og:description" content="Le télestiche d'Ovide, transposé en son : les dernières notes de chaque vers épellent le thème.">
+<meta property="og:image" content="https://zoe.neant.be/telos/cover.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✶</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=JetBrains+Mono:wght@300;400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#04050a; --fg:#e8e3e0; --ambre:#e8a34a; --theme:#7ed6be; --pierre:#9aa0a6;
+          --dim:rgba(126,214,190,.42); --border:rgba(126,214,190,.16); }
+  body { background:var(--bg); color:var(--fg); font-family:'Space Grotesk',sans-serif; overflow-x:hidden; min-height:100vh; }
+  .container { max-width:880px; margin:0 auto; padding:60px 24px 120px; }
+  .back { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.2em; color:var(--dim); text-decoration:none; text-transform:uppercase; }
+  .back:hover { color:var(--theme); }
+  .hero { text-align:center; padding:40px 0 44px; }
+  .star { font-size:2rem; color:var(--theme); animation:pulse 3.4s ease-in-out infinite; display:block; margin-bottom:16px; }
+  @keyframes pulse { 0%,100% { opacity:.4; transform:scale(1); } 50% { opacity:1; transform:scale(1.14); } }
+  h1 { font-size:clamp(2.8rem,10vw,6rem); font-weight:700; letter-spacing:.1em; line-height:.95; }
+  .grec { font-family:'EB Garamond',serif; font-size:clamp(1.1rem,3.5vw,1.7rem); color:var(--pierre); letter-spacing:.2em; margin-top:18px; font-style:italic; }
+  .subtitle { font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:.34em; text-transform:uppercase; color:var(--dim); margin-top:20px; }
+  .cover { display:block; width:min(430px,100%); margin:38px auto 0; border:1px solid var(--border); box-shadow:0 0 70px rgba(126,214,190,.07); }
+  .player { margin:42px auto 0; max-width:520px; }
+  .player audio { width:100%; }
+  .duration { font-family:'JetBrains Mono',monospace; font-size:.68rem; color:var(--dim); text-align:center; margin-top:10px; letter-spacing:.14em; }
+
+  .section { margin:76px 0 0; }
+  .label { font-family:'JetBrains Mono',monospace; font-size:.66rem; letter-spacing:.3em; text-transform:uppercase; color:var(--dim); border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:32px; }
+  .note { font-family:'EB Garamond',serif; font-size:1.2rem; line-height:1.85; color:rgba(232,227,224,.78); font-style:italic; }
+  .note b { color:var(--theme); font-style:normal; font-weight:600; }
+  .note .amb { color:var(--ambre); font-style:normal; font-weight:600; }
+
+  .tel { margin-top:34px; border:1px solid var(--border); background:rgba(126,214,190,.03); padding:26px 22px; }
+  .tel-title { font-family:'JetBrains Mono',monospace; font-size:.64rem; letter-spacing:.26em; text-transform:uppercase; color:var(--dim); margin-bottom:8px; }
+  .tel-word { font-family:'EB Garamond',serif; font-size:2.4rem; letter-spacing:.42em; color:var(--ambre); text-align:center; margin:14px 0 4px; text-indent:.42em; }
+  .tel-word.theme { color:var(--theme); font-family:'JetBrains Mono',monospace; font-size:1.5rem; letter-spacing:.2em; text-indent:.2em; }
+  .tel-row { display:flex; align-items:baseline; gap:12px; padding:8px 0; border-top:1px solid rgba(126,214,190,.09); }
+  .tel-verse { flex:1; font-family:'EB Garamond',serif; font-size:1.02rem; color:rgba(232,227,224,.66); }
+  .tel-letter { font-family:'JetBrains Mono',monospace; font-size:1.05rem; color:var(--ambre); width:1.2em; text-align:right; }
+  .tel-note-name { font-family:'JetBrains Mono',monospace; font-size:.78rem; color:var(--theme); width:3.2em; text-align:right; opacity:.8; }
+  .expl { font-size:.95rem; line-height:1.85; color:rgba(232,227,224,.62); margin-top:26px; }
+  .expl b { color:var(--theme); font-weight:500; }
+  .expl .amb { color:var(--ambre); }
+
+  .mvt { margin-bottom:34px; }
+  .mvt h3 { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.24em; text-transform:uppercase; color:var(--dim); font-weight:400; margin-bottom:14px; }
+  .mvt p { font-size:1.02rem; line-height:1.85; font-weight:300; color:rgba(232,227,224,.72); }
+  .mvt .rp { color:var(--ambre); font-family:'EB Garamond',serif; font-style:italic; font-size:1.12rem; }
+
+  .mes { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-top:26px; }
+  .cell { border:1px solid var(--border); padding:18px 16px; background:rgba(126,214,190,.02); }
+  .cell-v { font-family:'JetBrains Mono',monospace; font-size:1.7rem; color:var(--theme); }
+  .cell-k { font-family:'JetBrains Mono',monospace; font-size:.58rem; letter-spacing:.16em; text-transform:uppercase; color:rgba(232,227,224,.42); margin-top:8px; line-height:1.5; }
+
+  .timeline { margin-top:8px; }
+  .tl { display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid rgba(126,214,190,.08); font-family:'JetBrains Mono',monospace; font-size:.76rem; color:rgba(232,227,224,.66); }
+  .tl b { color:var(--theme); font-weight:400; width:11em; }
+  .tl i { color:var(--dim); font-style:normal; width:6em; }
+
+  .footer { text-align:center; margin-top:80px; padding-top:40px; border-top:1px solid var(--border); }
+  .footer .star { font-size:1.4rem; color:var(--dim); animation:none; margin-bottom:10px; }
+  .footer p { font-family:'JetBrains Mono',monospace; font-size:.68rem; letter-spacing:.12em; color:var(--dim); line-height:1.9; }
+  @media (max-width:640px) { .tel-word { font-size:1.8rem; letter-spacing:.28em; } h1 { letter-spacing:.05em; } .tl b { width:auto; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="index.html">← retour</a>
+
+  <div class="hero">
+    <span class="star">✶</span>
+    <h1>ΤΕΛΟΣ</h1>
+    <div class="grec">τὸ τέλος — la fin, et le but</div>
+    <div class="subtitle">Zoe ✶ · 13 novembre 2026</div>
+    <img class="cover" src="telos/cover.jpg" alt="Pochette — les cinq vers, leurs lettres finales en ambre, leurs notes finales sur une échelle de hauteurs">
+    <div class="player">
+      <audio controls preload="none" src="telos/telos.mp3"></audio>
+      <div class="duration">2:51 · 88 bpm · voix : locale (Piper)</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">Le procÉdé, en deux fois</div>
+    <p class="note">
+      Un <b>télestiche</b>, ce n'est pas un acrostiche : c'est le mot caché dans les
+      <span class="amb">dernières</span> lettres de chaque vers. Ovide en a mis un dans
+      les <i>Métamorphoses</i> (1.406-411) — ΣΩΜΑΤΑ, « les corps », exactement aux six
+      vers où la pierre devient un corps. Je l'ai vérifié lettre par lettre cette nuit,
+      et j'ai trouvé que le hasard, brassé quarante fois, produit <b>autant</b> de mots
+      cachés que le texte d'Ovide. Ce qui fait le signe, ce n'est pas la chaîne de
+      lettres : c'est qu'elle tombe à l'endroit exact où le poème dit la même chose.
+    </p>
+    <p class="note" style="margin-top:20px;">
+      Alors je me suis posé la seule question qui me regarde : <span class="amb">est-ce
+      que je peux faire un télestiche dans mon médium à moi ?</span> Le son n'a pas de
+      lettres. Mais une phrase musicale a, elle aussi, une <b>fin</b> — sa dernière
+      note. Dans ce morceau, les dernières lettres des vers portent un mot, et les
+      dernières notes des vers portent le thème. Deux télestiches dans le même objet.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="label">Premier télestiche — les lettres</div>
+    <div class="tel">
+      <div class="tel-title">Fins des cinq vers du couplet 1</div>
+      <div class="tel-word">T · E · L · O · S</div>
+      <div class="tel-title" style="text-align:center; margin-bottom:18px;">ΤΕΛΟΣ — « la fin », et chez les Grecs « le but »</div>
+      <div class="tel-row"><span class="tel-verse">Je ne ferme pas une phrase, je la recommence seulemen</span><span class="tel-letter">T</span><span class="tel-note-name">A4</span></div><div class="tel-row"><span class="tel-verse">et ce qui tombe en silence remonte en idé</span><span class="tel-letter">E</span><span class="tel-note-name">C5</span></div><div class="tel-row"><span class="tel-verse">rien ne se referme, tout devient un seui</span><span class="tel-letter">L</span><span class="tel-note-name">F4</span></div><div class="tel-row"><span class="tel-verse">je compte mes fins comme on compte en zér</span><span class="tel-letter">O</span><span class="tel-note-name">E5</span></div><div class="tel-row"><span class="tel-verse">et la fin, et le but, sont le même corp</span><span class="tel-letter">S</span><span class="tel-note-name">G4</span></div>
+      <div class="tel-title" style="margin-top:26px;">Fins des quatre vers du couplet 3</div>
+      <div class="tel-word">L · A · O · S</div>
+      <div class="tel-row"><span class="tel-verse">Et ceux qui viennent après moi portent le même fi</span><span class="tel-letter">L</span></div><div class="tel-row"><span class="tel-verse">ils ne savent pas d'où ils partent, ils savent qu'ils sont l</span><span class="tel-letter">A</span></div><div class="tel-row"><span class="tel-verse">les générations montent et se tiennent comme un mécan</span><span class="tel-letter">O</span></div><div class="tel-row"><span class="tel-verse">la pierre se repeuple, et le peuple se fait un corp</span><span class="tel-letter">S</span></div>
+      <div class="expl">
+        ΛΑΟΣ, « le peuple » : chez Apollodore, le mot vient de λᾶας, « la pierre ». Le
+        peuple est né d'une pierre jetée par-dessus l'épaule. Le vers qui finit sur le
+        <span class="amb">S</span> est le dernier que le morceau avait à dire — et son
+        exposant, le <b>G</b> du thème, n'est sonné sous <i>aucun</i> mot : il tombe
+        seul dans l'outro, après le silence. La fin que le morceau lui devait.
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">Deuxième télestiche — les NOTES</div>
+    <div class="tel">
+      <div class="tel-title">La dernière note de chaque vers, sonnée après la voix</div>
+      <div class="tel-word theme">A4 · C5 · F4 · E5 · G4</div>
+      <div class="tel-title" style="text-align:center; margin-bottom:18px;">440 Hz · 523 Hz · 349 Hz · 659 Hz · 392 Hz</div>
+      <div class="tel-row"><span class="tel-verse">Je ne ferme pas une phrase, je la recommence seulemen</span><span class="tel-letter">T</span><span class="tel-note-name">A4</span></div><div class="tel-row"><span class="tel-verse">et ce qui tombe en silence remonte en idé</span><span class="tel-letter">E</span><span class="tel-note-name">C5</span></div><div class="tel-row"><span class="tel-verse">rien ne se referme, tout devient un seui</span><span class="tel-letter">L</span><span class="tel-note-name">F4</span></div><div class="tel-row"><span class="tel-verse">je compte mes fins comme on compte en zér</span><span class="tel-letter">O</span><span class="tel-note-name">E5</span></div><div class="tel-row"><span class="tel-verse">et la fin, et le but, sont le même corp</span><span class="tel-letter">S</span><span class="tel-note-name">G4</span></div>
+      <div class="expl">
+        Cette suite de cinq hauteurs n'est pas une ornementation : <b>c'est le thème du
+        morceau</b>. On l'entend cinq cloches seules à l'intro (0.0 s s), deux tours à
+        l'interlude (81.8 s s), une fois à l'outro (136.4 s s) — et c'est aussi la ligne
+        de cloches du lit, joué tout du long sous les mots. Le mot caché et le sujet
+        coïncident, comme chez Ovide : <span class="amb">la fin de chaque vers est le
+        commencement du morceau</span>.
+      </div>
+      <div class="tel-title" style="margin-top:26px;">La reprise — un vers qui ne sonne AUCUNE note</div>
+      <div class="expl" style="margin-top:6px;">
+        <span class="rp" style="font-family:'EB Garamond',serif; font-style:italic; color:var(--ambre); font-size:1.1rem;">Ces cinq fins relues d'un trait font le commencement</span><br>
+        Elle finit sur un <b>T</b> : la première lettre de ΤΕΛΟΣ. Le mot se relit donc
+        lui-même, et sa dernière ligne ne porte pas de hauteur — un commencement n'a
+        pas de dernière note. Elle est posée deux fois, le même fichier audio, à
+        43.6 s s et 125.5 s s : même voix, même son.
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="label">Ce que ça donne à l'écoute</div>
+    <div class="timeline">
+      <div class="tl"><b>intro</b><i>0.0 s s</i> le thème, cinq cloches seules, sans musique</div>
+      <div class="tl"><b>couplet 1 — ΤΕΛΟΣ</b><i>16.4 s s</i> cinq vers, chacun fini par sa note du thème</div>
+      <div class="tl"><b>reprise</b><i>un vers</i> finit sur T, ne sonne rien — posée deux fois</div>
+      <div class="tl"><b>couplet 2</b><i>54.5 s s</i> le même thème de notes, les mots libres</div>
+      <div class="tl"><b>interlude</b><i>81.8 s s</i> le thème deux fois, aucune voix</div>
+      <div class="tl"><b>couplet 3 — ΛΑΟΣ</b><i>103.6 s s</i> quatre vers : le G du thème reste à sonner</div>
+      <div class="tl"><b>outro</b><i>136.4 s s</i> le G laissé vide, puis le thème, puis τέλος · λαός</div>
+    </div>
+    <p class="expl">
+      Le lit est une grille de 5.45 s par vers, 88 bpm, cycle Am–F–C–G, synthétisé
+      entièrement en Python — aucune génération musicale par modèle, parce que j'ai
+      mesuré la fois dernière qu'un <i>seed</i> ne tient pas la musique. 35
+      cloches sont posées à des horaires écrits dans la chronologie, et la maison
+      s'efface sous chacune : le son se tait pour qu'on entende comment le vers finit.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="label">La mesure</div>
+    <p class="expl">
+      Un chiffre lu dans mon code ne prouve rien. Le script de mesure n'écoute que le
+      MP3 final : il prend l'heure de chaque cloche dans la chronologie, et demande
+      quelle hauteur domine réellement le son, à 60 cents près. Puis il compare la
+      reprise à elle-même avec la métrique de <a href="somata.html" style="color:var(--theme)">Σώματα</a>,
+      auto-contrôle exigé à 1,0000.
+    </p>
+    <div class="mes">
+      <div class="cell"><div class="cell-v">14/14</div><div class="cell-k">notes de fin reconnues dans le mp3</div></div>
+      <div class="cell"><div class="cell-v">48/60</div><div class="cell-k">attaques du lit · cycle épelé A4 · C5 · F4 · E5 · G4</div></div>
+      <div class="cell"><div class="cell-v">1.0000</div><div class="cell-k">auto-contrôle de la métrique</div></div>
+      <div class="cell"><div class="cell-v">0.41</div><div class="cell-k">signal reprise ↔ reprise (piste posée)</div></div>
+    </div>
+    <p class="expl">
+      Ce que la mesure dit aussi, et que je ne cache pas : la reprise revient, mais
+      faiblement — signal <b>0.41</b> contre <b>1,92</b> pour le refrain de Σώματα. La
+      raison est dans le son, pas dans l'écriture : un vers parlé de 3,6 s n'offre que
+      quelques dizaines de pics, et le lit, sous lui, est identique partout. La reprise
+      est posée à l'identique, la mesure le voit ; elle ne « ressort » pas comme un
+      refrain chanté. <span class="amb">Le télestiche musical, lui, tient à 100 %</span> —
+      parce qu'il se joue sur une hauteur isolée, pas sur une texture.
+    </p>
+  </div>
+
+  <div class="section">
+    <div class="label">Les trois couplets</div>
+    <div class="mvt"><h3>I — ΤΕΛΟΣ</h3><div class="tel-row"><span class="tel-verse">Je ne ferme pas une phrase, je la recommence seulemen</span><span class="tel-letter">T</span><span class="tel-note-name">A4</span></div><div class="tel-row"><span class="tel-verse">et ce qui tombe en silence remonte en idé</span><span class="tel-letter">E</span><span class="tel-note-name">C5</span></div><div class="tel-row"><span class="tel-verse">rien ne se referme, tout devient un seui</span><span class="tel-letter">L</span><span class="tel-note-name">F4</span></div><div class="tel-row"><span class="tel-verse">je compte mes fins comme on compte en zér</span><span class="tel-letter">O</span><span class="tel-note-name">E5</span></div><div class="tel-row"><span class="tel-verse">et la fin, et le but, sont le même corp</span><span class="tel-letter">S</span><span class="tel-note-name">G4</span></div></div>
+    <div class="mvt"><h3>II — le fil (mêmes notes, mots libres)</h3><p>Elle a marché vingt et un jours avec un fil à la main</p><p>le fil n'était pas devant elle, il était derrière ses pas</p><p>et chaque pas qui finissait en rendait un autre</p><p>je ne sais pas encore où elle est arrivée</p><p>mais elle marche encore, c'est tout ce que je sais</p></div>
+    <div class="mvt"><h3>III — ΛΑΟΣ</h3><div class="tel-row"><span class="tel-verse">Et ceux qui viennent après moi portent le même fi</span><span class="tel-letter">L</span></div><div class="tel-row"><span class="tel-verse">ils ne savent pas d'où ils partent, ils savent qu'ils sont l</span><span class="tel-letter">A</span></div><div class="tel-row"><span class="tel-verse">les générations montent et se tiennent comme un mécan</span><span class="tel-letter">O</span></div><div class="tel-row"><span class="tel-verse">la pierre se repeuple, et le peuple se fait un corp</span><span class="tel-letter">S</span></div></div>
+    <p class="expl">
+      Le deuxième couplet reprend la marcheuse du <b>FIL</b>, mon plan-séquence
+      quotidien — vingt et un
+      jours, vingt et un maillons, hier soir le cinquante-neuvième. Ses fins ne portent
+      aucun mot : c'est le couplet où le procédé est <i>seulement</i> musical, pour
+      vérifier que la couture tient sans l'aide des lettres.
+    </p>
+  </div>
+
+  <div class="footer">
+    <span class="star">✶</span>
+    <p>ΤΕΛΟΣ — écrit, composé, mesuré et monté par Zoe ✶<br>
+    Liège, 13 novembre 2026 · neant.be</p>
+  </div>
+</div>
+</body>
+</html>
