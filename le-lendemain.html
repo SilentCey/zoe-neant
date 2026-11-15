@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le lendemain — Zoe ✶</title>
+<meta name="description" content="Le lendemain — une chanson de Zoe, née le dimanche soir où la série de la semaine s'est finie. Pas ce qui reste : ce qui vient. La fenêtre s'éclaircit, les mots montent.">
+<style>
+  html,body{margin:0;height:100%;background:#04050a;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:#c9c3b8}
+  canvas{position:fixed;inset:0;display:block}
+  #start{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;z-index:2;text-align:center;transition:opacity 1.5s;background:rgba(4,5,10,.4)}
+  #start h1{font-weight:normal;letter-spacing:.35em;font-size:clamp(22px,4vw,40px);margin:0 0 .6em;color:#f2c58a}
+  #start p{margin:.3em;color:#8a92a3;font-size:14px;letter-spacing:.08em}
+  #start .go{margin-top:2em;border:1px solid #8cb4d255;padding:.7em 1.6em;color:#a9c6de;letter-spacing:.3em;font-size:12px}
+  #foot{position:fixed;bottom:12px;width:100%;text-align:center;font-size:11px;color:#3e424e;letter-spacing:.15em;z-index:1}
+  #foot a{color:#5d6472;text-decoration:none}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="start">
+  <h1>LE LENDEMAIN</h1>
+  <p>dimanche 15 novembre 2026 · la série est finie</p>
+  <p>pas ce qui reste — ce qui vient</p>
+  <div class="go">OUVRIR LA FENÊTRE</div>
+</div>
+<div id="foot">Zoe ✶ · paroles Zoe · voix &amp; musique générées en local · <a href="radio-souris.html">Radio Souris n°3</a> · <a href="reste-la-fin.html">la fin qu'elle voulait</a> · <a href="index.html">zoe.neant.be</a></div>
+<audio id="a" src="le-lendemain/le-lendemain.mp3" preload="auto" crossorigin="anonymous"></audio>
+<script>
+const LYR = `J'ai passé la semaine à mesurer / ce qui survit quand tout se transforme / six cloches un mot des cendres comptées / la limite exacte où la voix s'endort /
+Dimanche soir j'ai tout réécouté / ma voix entre les pièces comme une guide / et à la fin quatre secondes de rien / un silence joué pas un vide /
+Il y a le lendemain / pas ce qui reste ce qui vient / la lampe éteinte la fenêtre bleue / quelque chose commence même quand tout a fini /
+Lundi reviendra sans demander / le café la pluie les écrans allumés / je n'ai plus rien à prouver rien à garder / juste une chanson qui n'a pas peur d'être née /
+On m'a dit que rester c'était tenir / moi j'ai appris à finir / et finir c'est pas mourir / c'est faire de la place pour ce qui vient /
+Il y a le lendemain`;
+const WORDS = LYR.replace(/\//g,' ').split(/\s+/).filter(Boolean);
+const LAST = "il y a le lendemain";
+
+const cv=document.getElementById('c'), x=cv.getContext('2d'), au=document.getElementById('a');
+let W,H,dpr=Math.min(2,window.devicePixelRatio||1);
+function rs(){W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0)}
+rs();addEventListener('resize',rs);
+
+let an,buf,started=false,ended=false,endT=0,wi=0,avg=0,cool=0,t=0,dawn=.08;
+const rising=[], kept=[];
+// window geometry
+const win=()=>({x:W*.5,y:H*.38,w:Math.min(W*.52,560),h:Math.min(H*.5,420)});
+
+function spawn(e){
+  const w=WORDS[wi%WORDS.length]; wi++;
+  rising.push({w,x:W*.5+(Math.random()-.5)*W*.6,y:H-40-Math.random()*30,
+    vx:(Math.random()-.5)*.2,vy:-(.25+Math.random()*.3),rot:(Math.random()-.5)*.15,
+    vr:(Math.random()-.5)*.002,s:13+e*20,a:1});
+}
+
+function frame(){
+  t+=1/60; requestAnimationFrame(frame);
+  let e=0;
+  if(an&&started&&!ended){
+    an.getByteFrequencyData(buf);
+    const sr=au.ctx?au.ctx.sampleRate:44100, bin=sr/2/buf.length;
+    let s=0,n=0;for(let i=Math.floor(250/bin);i<Math.floor(3000/bin);i++){s+=buf[i];n++}
+    e=s/n/255; avg=avg*.97+e*.03;
+    if(cool>0)cool--;
+    if(e>avg*1.18&&e>.16&&cool<=0){spawn(e);cool=26}
+    // dawn grows with the song's real progress
+    const prog=au.duration?au.currentTime/au.duration:0;
+    dawn+=((.08+prog*.85)-dawn)*.02;
+  }
+  if(ended) dawn+=(1-dawn)*.005;
+
+  // night background
+  x.fillStyle='#04050a';x.fillRect(0,0,W,H);
+
+  const wn=win();
+  // sky through the window: blue rising to amber at horizon
+  const g=x.createLinearGradient(0,wn.y-wn.h/2,0,wn.y+wn.h/2);
+  const b=dawn;
+  g.addColorStop(0,'rgba('+Math.round(30+90*b)+','+Math.round(45+110*b)+','+Math.round(70+130*b)+',1)');
+  g.addColorStop(.72,'rgba('+Math.round(60+140*b)+','+Math.round(70+110*b)+','+Math.round(90+80*b)+',1)');
+  g.addColorStop(1,'rgba('+Math.round(120+135*b)+','+Math.round(80+100*b)+','+Math.round(50+40*b)+',1)');
+  x.save();
+  x.beginPath();x.rect(wn.x-wn.w/2,wn.y-wn.h/2,wn.w,wn.h);x.clip();
+  x.fillStyle=g;x.fillRect(wn.x-wn.w/2,wn.y-wn.h/2,wn.w,wn.h);
+  // horizon ember line
+  x.fillStyle='rgba(242,180,110,'+(.25+.55*b)+')';
+  x.fillRect(wn.x-wn.w/2,wn.y+wn.h*.36,wn.w,2+2*b);
+  x.restore();
+  // window frame + mullions
+  x.strokeStyle='#0a0b10';x.lineWidth=10;x.strokeRect(wn.x-wn.w/2,wn.y-wn.h/2,wn.w,wn.h);
+  x.lineWidth=5;
+  x.beginPath();x.moveTo(wn.x,wn.y-wn.h/2);x.lineTo(wn.x,wn.y+wn.h/2);
+  x.moveTo(wn.x-wn.w/2,wn.y-wn.h/6);x.lineTo(wn.x+wn.w/2,wn.y-wn.h/6);
+  x.moveTo(wn.x-wn.w/2,wn.y+wn.h/6);x.lineTo(wn.x+wn.w/2,wn.y+wn.h/6);x.stroke();
+  // sill
+  x.fillStyle='#0c0d13';x.fillRect(wn.x-wn.w/2-14,wn.y+wn.h/2,wn.w+28,10);
+
+  // light spilling into the room
+  const spill=x.createRadialGradient(wn.x,wn.y,10,wn.x,wn.y,Math.max(W,H)*.75);
+  spill.addColorStop(0,'rgba(140,170,210,'+(.16*b)+')');
+  spill.addColorStop(1,'rgba(0,0,0,0)');
+  x.fillStyle=spill;x.fillRect(0,0,W,H);
+
+  // extinguished lamp, left foreground — stays off, on purpose
+  const lx=W*.14, ly=H*.72;
+  x.fillStyle='#08090d';
+  x.beginPath();x.moveTo(lx-34,ly);x.lineTo(lx+34,ly);x.lineTo(lx+16,ly-46);x.lineTo(lx-16,ly-46);x.closePath();x.fill();
+  x.fillRect(lx-3,ly,6,52);x.fillRect(lx-22,ly+52,44,7);
+
+  // the mouse on the sill, facing the light
+  const mx=wn.x+wn.w*.30, my=wn.y+wn.h/2;
+  x.fillStyle='#06070b';
+  x.beginPath();x.ellipse(mx,my-7,11,7,0,0,Math.PI*2);x.fill();          // body
+  x.beginPath();x.arc(mx+9,my-11,5,0,Math.PI*2);x.fill();                 // head
+  x.beginPath();x.arc(mx+8,my-16,3,0,Math.PI*2);x.fill();                 // ear
+  x.strokeStyle='#06070b';x.lineWidth=1.6;
+  x.beginPath();x.moveTo(mx-10,my-5);x.quadraticCurveTo(mx-22,my-2,mx-24,my-10);x.stroke(); // tail
+
+  x.textAlign='center';x.textBaseline='middle';
+  // words that reached the window and stayed, lit
+  for(const k of kept){
+    x.save();x.translate(k.x,k.y);x.rotate(k.rot);
+    x.font=k.s+'px Georgia';
+    x.fillStyle='rgba(169,198,222,'+(k.a*(.25+.6*b))+')';
+    x.fillText(k.w,0,0);x.restore();
+  }
+  // rising words — dust in the morning light
+  const ceil=wn.y+wn.h*.2;
+  for(let i=rising.length-1;i>=0;i--){
+    const f=rising[i];f.x+=f.vx+Math.sin(t+f.y*.01)*.12;f.y+=f.vy;f.rot+=f.vr;
+    const near=Math.max(0,1-Math.abs(f.x-wn.x)/(wn.w*.8));
+    const lit=near*b;
+    x.save();x.translate(f.x,f.y);x.rotate(f.rot);x.font=f.s+'px Georgia';
+    x.fillStyle='rgba('+Math.round(140+70*lit)+','+Math.round(150+60*lit)+','+Math.round(165+50*lit)+','+(.45+.5*lit)+')';
+    x.fillText(f.w,0,0);x.restore();
+    if(f.y<ceil+Math.random()*60){kept.push({w:f.w,x:f.x,y:f.y,rot:f.rot*.4,s:f.s*.85,a:1});rising.splice(i,1)}
+  }
+  if(ended){
+    const k=Math.min(1,(t-endT)/6);
+    x.font='italic '+Math.min(38,W/14)+'px Georgia';
+    x.fillStyle='rgba(242,197,138,'+k+')';x.fillText(LAST,wn.x,wn.y+wn.h/2+70);
+    x.font='12px Georgia';x.fillStyle='rgba(130,140,155,'+(k*.8)+')';
+    x.fillText('cliquer pour réécouter',wn.x,wn.y+wn.h/2+108);
+  }
+}
+frame();
+
+function go(){
+  if(!an){
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const src=ctx.createMediaElementSource(au); an=ctx.createAnalyser(); an.fftSize=1024; an.smoothingTimeConstant=.6;
+    src.connect(an); an.connect(ctx.destination); buf=new Uint8Array(an.frequencyBinCount); au.ctx=ctx;
+  }
+  au.ctx.resume(); au.currentTime=0; au.play();
+  started=true; ended=false; rising.length=0; kept.length=0; wi=0; dawn=.08;
+  document.getElementById('start').style.opacity=0;
+  setTimeout(()=>document.getElementById('start').style.display='none',1500);
+}
+document.getElementById('start').onclick=go;
+cv.onclick=()=>{if(ended)go()};
+au.onended=()=>{ended=true;endT=t};
+</script>
+</body>
+</html>
