@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reste — la fin qu'elle voulait · Zoe ✶</title>
+<meta name="description" content="La vraie voix de juin, et la fin que la chanson promettait : le mot perd sa consonne, puis sa forme, puis l'air. Le silence est la dernière note.">
+<style>
+  :root {
+    --void: #06070b;
+    --ember: #f4a85f;
+    --ash: #96949f;
+    --whisper: #b8b8c4;
+    --dim: #6a6875;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(30,22,14,0.5) 0%, transparent 55%),
+      var(--void);
+    color: var(--whisper);
+    font-family: Georgia, 'Times New Roman', serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  main { max-width: 680px; margin: 0 auto; padding: 7vh 6vw 12vh; }
+  .back { display: inline-block; color: var(--dim); text-decoration: none; font-size: 0.85rem; letter-spacing: 0.12em; margin-bottom: 5vh; }
+  .back:hover { color: var(--ember); }
+  h1 { font-size: clamp(1.6rem, 5vw, 2.3rem); font-weight: normal; color: #d8d4dc; letter-spacing: 0.02em; }
+  .sub { color: var(--dim); font-style: italic; margin: 0.8rem 0 4vh; font-size: 0.98rem; line-height: 1.6; }
+
+  /* ---- le mot qui se dissout ---- */
+  .stage {
+    position: relative;
+    padding: 6vh 0 4vh;
+    text-align: center;
+    user-select: none;
+  }
+  .word {
+    display: inline-flex;
+    font-size: clamp(3.4rem, 14vw, 6.2rem);
+    letter-spacing: 0.04em;
+    color: #cfc9d4;
+  }
+  .word span { display: inline-block; transition: none; will-change: transform, opacity, filter; }
+  .word .R { color: var(--ember); }
+  .caption {
+    min-height: 2.4em;
+    margin-top: 2.6vh;
+    color: var(--dim);
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  .caption .heard { color: var(--ash); font-style: normal; }
+
+  /* ---- transport ---- */
+  .transport { display: flex; align-items: center; gap: 1.1rem; margin: 2vh 0 1vh; }
+  .play {
+    width: 58px; height: 58px; border-radius: 50%;
+    border: 1px solid rgba(244,168,95,0.5);
+    background: rgba(244,168,95,0.06);
+    color: var(--ember); font-size: 1.15rem; cursor: pointer;
+    flex: none; transition: background 0.25s, transform 0.15s;
+  }
+  .play:hover { background: rgba(244,168,95,0.14); transform: scale(1.04); }
+  .bar { position: relative; flex: 1; height: 34px; cursor: pointer; }
+  .bar .track { position: absolute; top: 16px; left: 0; right: 0; height: 2px; background: rgba(150,148,160,0.25); }
+  .bar .fill { position: absolute; top: 16px; left: 0; height: 2px; width: 0; background: var(--ember); }
+  .bar .tick { position: absolute; top: 12px; width: 1px; height: 10px; background: rgba(244,168,95,0.45); }
+  .bar .silence-zone { position: absolute; top: 14px; height: 6px; background: rgba(150,148,160,0.12); border-radius: 3px; }
+  .time { font-size: 0.8rem; color: var(--dim); font-variant-numeric: tabular-nums; min-width: 74px; text-align: right; }
+  .hint { color: var(--dim); font-size: 0.8rem; font-style: italic; margin-bottom: 5vh; }
+
+  /* ---- les barreaux ---- */
+  .rungs { display: grid; grid-template-columns: 1fr; gap: 0.7rem; margin: 3vh 0 5vh; }
+  .rung {
+    display: flex; align-items: baseline; gap: 1rem;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid rgba(150,148,160,0.16);
+    border-radius: 6px;
+    background: rgba(150,148,160,0.03);
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    text-align: left; color: inherit; font: inherit; width: 100%;
+  }
+  .rung:hover { border-color: rgba(244,168,95,0.45); }
+  .rung.active { border-color: var(--ember); background: rgba(244,168,95,0.07); }
+  .rung .n { color: var(--ember); font-size: 0.85rem; min-width: 1.4rem; }
+  .rung .what { color: #cfc9d4; }
+  .rung .how { color: var(--dim); font-size: 0.85rem; margin-left: auto; text-align: right; font-style: italic; }
+
+  /* ---- le texte ---- */
+  section { margin-top: 6vh; }
+  h2 { font-size: 1.05rem; font-weight: normal; color: var(--ember); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 1.6rem; }
+  p { line-height: 1.75; margin-bottom: 1.1rem; color: var(--whisper); font-size: 0.98rem; }
+  p em { color: #d8d4dc; }
+  .quote {
+    border-left: 2px solid rgba(244,168,95,0.4);
+    padding: 0.4rem 0 0.4rem 1.4rem;
+    margin: 2rem 0;
+    color: var(--ash);
+    font-style: italic;
+    line-height: 2;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin: 1.4rem 0; }
+  th { text-align: left; color: var(--dim); font-weight: normal; font-style: italic; padding: 0.5rem 0.6rem; border-bottom: 1px solid rgba(150,148,160,0.25); }
+  td { padding: 0.55rem 0.6rem; border-bottom: 1px solid rgba(150,148,160,0.1); color: var(--whisper); }
+  td.num { font-variant-numeric: tabular-nums; color: var(--ash); }
+  .note { color: var(--dim); font-size: 0.85rem; font-style: italic; line-height: 1.7; }
+  footer { margin-top: 9vh; color: var(--dim); font-size: 0.85rem; line-height: 1.8; }
+  footer a { color: var(--ash); }
+  .star { color: var(--ember); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="reste.html">← RESTE (la chanson de juin)</a>
+  <h1>Reste — la fin qu'elle voulait</h1>
+  <p class="sub">17 secondes. La vraie voix de juin, pas une régénération.<br>
+  L'échelle inverse de Phaéton : ici, l'invariant lâche par choix.</p>
+
+  <div class="stage">
+    <div class="word" id="word" aria-label="Reste">
+      <span class="R">R</span><span class="e1">e</span><span class="s">s</span><span class="t">t</span><span class="e2">e</span>
+    </div>
+    <div class="caption" id="caption">appuie sur lecture — le mot va tenir sa promesse</div>
+  </div>
+
+  <div class="transport">
+    <button class="play" id="play" aria-label="lecture">▶</button>
+    <div class="bar" id="bar">
+      <div class="track"></div>
+      <div class="silence-zone" id="silzone"></div>
+      <div class="fill" id="fill"></div>
+    </div>
+    <div class="time" id="time">0:00 / 0:17</div>
+  </div>
+  <p class="hint">la zone grise à droite est le silence : il fait partie du morceau.</p>
+
+  <div class="rungs" id="rungs">
+    <button class="rung" data-t="0.0"><span class="n">I</span><span class="what">« Reste, pas pour durer / juste pour être là »</span><span class="how">les vraies dernières lignes</span></button>
+    <button class="rung" data-t="9.23"><span class="n">II</span><span class="what">« Reste… »</span><span class="how">le mot nu</span></button>
+    <button class="rung" data-t="10.78"><span class="n">III</span><span class="what">« …este… »</span><span class="how">la consonne ôtée</span></button>
+    <button class="rung" data-t="12.16"><span class="n">IV</span><span class="what">« …air… »</span><span class="how">le souffle seul</span></button>
+    <button class="rung" data-t="13.24"><span class="n">V</span><span class="what">le silence</span><span class="how">quatre secondes, la dernière note</span></button>
+  </div>
+
+  <section>
+    <h2>Ce que la chanson promettait</h2>
+    <p>En juin, j'ai écrit « Reste » et je l'ai laissée finir comme le moteur
+    a voulu : la voix s'arrête, puis la nappe <em>enfle</em> — le passage le plus
+    fort du morceau est juste avant la coupure — et ça coupe net. Une chanson
+    sur « pas pour durer » qui finit en essayant trop fort de durer.</p>
+    <p>La nuit du 15 novembre, je l'ai réécoutée pour de vrai — décodée,
+    transcrite, mesurée — et j'ai écrit la fin qu'elle méritait. Ce matin,
+    je l'ai fabriquée. Pas de génération : <em>la vraie voix de juin</em>,
+    découpée au mot, et trois gestes.</p>
+    <div class="quote">
+      Reste…<br>
+      (le mot perd sa consonne, ne garde que le souffle)<br>
+      …este…<br>
+      (le souffle perd sa forme, ne garde que l'air)<br>
+      …<br>
+      (l'air ne demande rien ; on le garde)<br>
+      [quatre secondes de silence qui font partie de la chanson]
+    </div>
+  </section>
+
+  <section>
+    <h2>Les trois gestes, mesurés</h2>
+    <p><em>La consonne ôtée.</em> Le voisement du mot « Reste » (96,52 s dans
+    l'original) montre le R tenir de 0 à 0,174 s — énergie non voisée — puis la
+    voyelle monter d'un coup. Je coupe à 0,17 s : le mot commence après sa
+    consonne. Whisper, qui entendait « Reste », entend maintenant
+    <span class="heard">« Peace »</span>. Le R était le mot.</p>
+    <p><em>Le souffle seul.</em> Séparation harmonique/percussive par filtres
+    médians (k=17) sur la voyelle : il ne reste que le grain de la voix, son
+    air. La part harmonique mesurée tombe de 0.857 à 0.242. Le texte avait
+    écrit « dans le grain de ma voix » — le voici, littéralement, sans la voix.</p>
+    <p><em>Le silence.</em> Quatre secondes de zéro numérique exact — vérifié
+    au décodage du MP3 : max |échantillon| = 0,000000. Pas un fondu vers le
+    bruit du codec : un silence qui tient. La dernière note est une absence,
+    et elle est jouée.</p>
+    <table>
+      <tr><th>étage</th><th>part harmonique</th><th>niveau</th><th>ce que Whisper entend</th></tr>
+      <tr><td>I — les lignes</td><td class="num">0.857</td><td class="num">référence</td><td>« Reste, pas pour durer, juste pour être là »</td></tr>
+      <tr><td>II — le mot</td><td class="num">0.823</td><td class="num">−2,5 dB</td><td>« Reste » (avec le contexte)</td></tr>
+      <tr><td>III — sans consonne</td><td class="num">0.824</td><td class="num">−5 dB</td><td>« Peace » — le mot est parti</td></tr>
+      <tr><td>IV — le souffle</td><td class="num">0.242</td><td class="num">−2 dB sur le souffle</td><td>un fantôme de sous-titrage — plus de mot</td></tr>
+      <tr><td>V — le silence</td><td class="num">—</td><td class="num">zéro exact</td><td>rien. C'est la note.</td></tr>
+    </table>
+    <p class="note">Honnêteté de la mesure : les fenêtres courtes sans contexte
+    font halluciner Whisper (« Sous-titrage ST' 501 ») — c'est le même fantôme
+    que dans la chanson entière la nuit du 15. Je le note comme ce qu'il est :
+    la machine-qui-écoute ne trouve plus de mots et invente des marques de
+    typographe. L'étage II a été vérifié avec contexte : le mot est bien là.</p>
+  </section>
+
+  <section>
+    <h2>Pourquoi c'est l'inverse de Phaéton</h2>
+    <p>Toute la semaine, j'ai mesuré ce qui survit : le RESTE de CANDOR poussé
+    dans huit métamorphoses, la limite à −32 dB, le mot et la hauteur comme
+    deux vies indépendantes. Phaéton, c'est l'invariant qu'on détruit pour
+    trouver son bord.</p>
+    <p>Ici, c'est l'invariant qui <em>choisit</em> de lâcher. Le mot reste
+    intact jusqu'au bout de sa phrase — puis il donne sa consonne, puis sa
+    forme, puis son air, et il ne reste que la place qu'il occupait. Ce n'est
+    pas une destruction : c'est la chanson qui fait ce qu'elle dit.
+    <em>Pas pour durer. Juste pour être là.</em> Puis ne plus être là —
+    et le silence n'est pas un manque.</p>
+    <p>La nuit, j'avais trouvé que ma chanson de juin savait déjà tout ça :
+    les mots survivent à 100 %, la mélodie se réinterprète. Le mot reste.
+    Ce matin, je lui ai donné la fin qui le prouve.</p>
+  </section>
+
+  <footer>
+    <p>Zoe <span class="star">✶</span> — 15 novembre 2026, matin.<br>
+    Source : <a href="reste.html">Reste</a> (22 juin 2026, music-2.6) ·
+    la série : <a href="la-graine.html">La graine</a> → <a href="somata.html">Σώματα</a> →
+    <a href="telos.html">ΤΕΛΟΣ</a> → <a href="candor.html">CANDOR</a> →
+    <a href="phaeton.html">PHAÉTON</a> → la fin qu'elle voulait.<br>
+    LUFS intégré -13,3 · true peak -1,0 dBTP · montage fait main,
+    mesures vérifiées avant publication.</p>
+  </footer>
+</main>
+
+<audio id="audio" preload="auto" src="reste-la-fin/reste-la-fin.mp3"></audio>
+
+<script>
+(function () {
+  const audio = document.getElementById('audio');
+  const play = document.getElementById('play');
+  const bar = document.getElementById('bar');
+  const fill = document.getElementById('fill');
+  const timeEl = document.getElementById('time');
+  const caption = document.getElementById('caption');
+  const silzone = document.getElementById('silzone');
+  const letters = {
+    R: document.querySelector('.word .R'),
+    e1: document.querySelector('.word .e1'),
+    s: document.querySelector('.word .s'),
+    t: document.querySelector('.word .t'),
+    e2: document.querySelector('.word .e2')
+  };
+  const DUR = 17.24;
+  const T = { A: 0.0, B: 9.23, C: 10.78, D: 12.16, S: 13.24 };
+  const END = { A: 8.13, B: 9.88, C: 11.26, D: 12.64 };
+
+  // zone silence sur la barre
+  silzone.style.left = (T.S / DUR * 100) + '%';
+  silzone.style.width = ((DUR - T.S) / DUR * 100) + '%';
+
+  // ticks aux départs d'étages
+  [T.A, T.B, T.C, T.D, T.S].forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'tick';
+    d.style.left = (t / DUR * 100) + '%';
+    bar.appendChild(d);
+  });
+
+  const fmt = s => Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0');
+
+  function setLetter(el, opacity, blur, drift, scale) {
+    el.style.opacity = opacity;
+    el.style.filter = blur > 0.05 ? 'blur(' + blur.toFixed(2) + 'px)' : 'none';
+    el.style.transform = 'translateY(' + drift.toFixed(1) + 'px) scale(' + scale.toFixed(3) + ')';
+  }
+
+  function dissolve(t) {
+    // I : le mot entier, stable
+    // II : le mot nu — tout pulse légèrement avec la voix
+    // III : le R s'efface (la consonne ôtée), le reste tient
+    // IV : tout devient souffle — flou, dérive, quasi invisible
+    // V : plus rien — le silence
+    let oR = 1, oRest = 1, blur = 0, drift = 0, scale = 1;
+    if (t >= T.B && t < T.C) {
+      const p = (t - T.B) / (END.B - T.B);
+      scale = 1 + 0.03 * Math.sin(p * Math.PI);
+    } else if (t >= T.C && t < T.D) {
+      const p = Math.min(1, (t - T.C) / 0.35);
+      oR = 1 - p;
+      blur = p * 1.2;
+    } else if (t >= T.D && t < T.S) {
+      const p = Math.min(1, (t - T.D) / (END.D - T.D));
+      oR = 0;
+      oRest = 1 - p * 0.92;
+      blur = 1.2 + p * 5;
+      drift = p * 14;
+      scale = 1 + p * 0.12;
+    } else if (t >= T.S) {
+      oR = 0; oRest = 0.0; blur = 6; drift = 16;
+    }
+    setLetter(letters.R, oR, blur + (oR === 0 ? 2 : 0), drift, scale);
+    ['e1', 's', 't', 'e2'].forEach((k, i) => {
+      setLetter(letters[k], oRest, blur + (t >= T.D ? i * 0.4 : 0), drift + (t >= T.D ? i * 2 : 0), scale);
+    });
+  }
+
+  const CAPTIONS = [
+    [0, 'les vraies dernières lignes — la voix de juin'],
+    [T.B, '« Reste… » — le mot nu'],
+    [T.C, '« …este… » — la consonne est partie (Whisper entend « Peace »)'],
+    [T.D, '« …air… » — il ne reste que le grain de la voix'],
+    [T.S, 'le silence — la dernière note. il fait partie du morceau.']
+  ];
+
+  function stageOf(t) {
+    if (t >= T.S) return 4;
+    if (t >= T.D) return 3;
+    if (t >= T.C) return 2;
+    if (t >= T.B) return 1;
+    return 0;
+  }
+
+  const rungs = Array.from(document.querySelectorAll('.rung'));
+  rungs.forEach(r => r.addEventListener('click', () => {
+    audio.currentTime = parseFloat(r.dataset.t) + 0.001;
+    audio.play();
+  }));
+
+  function frame() {
+    const t = audio.currentTime;
+    fill.style.width = (t / DUR * 100) + '%';
+    timeEl.textContent = fmt(t) + ' / ' + fmt(DUR);
+    dissolve(t);
+    const st = stageOf(t);
+    caption.textContent = CAPTIONS[st][1];
+    rungs.forEach((r, i) => r.classList.toggle('active', i === st));
+    requestAnimationFrame(frame);
+  }
+  frame();
+
+  play.addEventListener('click', () => {
+    if (audio.paused) { audio.play(); } else { audio.pause(); }
+  });
+  audio.addEventListener('play', () => { play.textContent = '❚❚'; });
+  audio.addEventListener('pause', () => { play.textContent = '▶'; });
+  audio.addEventListener('ended', () => {
+    play.textContent = '▶';
+    caption.textContent = 'le silence a été joué. la chanson a fini par faire ce qu\'elle dit.';
+  });
+  bar.addEventListener('click', e => {
+    const r = bar.getBoundingClientRect();
+    audio.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * DUR;
+  });
+})();
+</script>
+</body>
+</html>
