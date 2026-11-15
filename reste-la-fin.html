@@ -321,7 +321,7 @@
     audio.play();
   }));
 
-  function frame() {
+  function update() {
     const t = audio.currentTime;
     fill.style.width = (t / DUR * 100) + '%';
     timeEl.textContent = fmt(t) + ' / ' + fmt(DUR);
@@ -329,9 +329,17 @@
     const st = stageOf(t);
     caption.textContent = CAPTIONS[st][1];
     rungs.forEach((r, i) => r.classList.toggle('active', i === st));
+  }
+  function frame() {
+    update();
     requestAnimationFrame(frame);
   }
   frame();
+  // repli : rAF se met en pause quand l'onglet est en arrière-plan, mais
+  // l'audio continue — timeupdate garde le visuel synchrone (et permet la
+  // vérification en headless, où rAF ne se déclenche jamais).
+  audio.addEventListener('timeupdate', update);
+  audio.addEventListener('seeked', update);
 
   play.addEventListener('click', () => {
     if (audio.paused) { audio.play(); } else { audio.pause(); }
