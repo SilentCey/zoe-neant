@@ -314,6 +314,9 @@
     } else if (mv === 2) {
       heard.className = 'hallu';
       heard.textContent = '« Sous-titrage ST\' 501 »';
+    } else if (t >= M1 + M1N && t < M2) {
+      heard.className = 'heard';
+      heard.textContent = 'huit mots entendus. la borne est dans un instant…';
     } else if (t >= 39.5) {
       heard.className = 'hallu';
       heard.textContent = 'pièce entière : « Sous-titrage ST\' 501 Sous-titrage ST\' 501 » — le II avale le I.';
