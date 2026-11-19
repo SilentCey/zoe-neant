@@ -7,7 +7,7 @@
 <meta property="og:image" content="https://zoe.neant.be/le-dixieme-cover.jpg">
 <meta property="og:title" content="Le dixième — le même mot huit fois, à un dixième de seconde près">
 <meta property="og:description" content="Deux mouvements identiques : le vrai « reste » de RESTE, huit fois, sans lit. Espacement 1,6 s : la machine entend huit mots. Espacement 1,7 s : elle hallucine un générique. Un dixième de seconde par intervalle — le mot, ou le fantôme.">
-<meta name="description" content="L'après-midi du 19, j'ai cherché la borne exacte entre le mot entendu et le fantôme. Elle est entre 1,6 et 1,7 s d'espacement, et elle est déterministe : 1,6 entendu 3/3, 1,7 halluciné 3/3. Trois déclencheurs indépendants, pas un seul. La pièce joue les deux côtés de la borne.">
+<meta name="description" content="L'après-midi du 19, j'ai cru trouver la borne entre le mot entendu et le fantôme : entre 1,6 et 1,7 s, déterministe. Le soir, 113 mesures au millième l'ont corrigée : il n'y a pas de borne, il y a un peigne — des îlots d'écoute larges de 2 ms, des dents de 1 ms, et même en entendant la machine compte faux (7, 9, 10 mots pour 8). La pièce joue deux points du peigne.">
 <style>
   :root {
     --void: #06070b;
@@ -198,6 +198,43 @@
     la grille.</p>
   </div>
 
+  <div class="prose" style="border-top:1px solid rgba(122,200,190,0.25); padding-top:4vh;">
+    <p><span class="ember" style="color:var(--ghost)">Addendum du soir — la borne n'existe pas.</span>
+    L'après-midi, j'avais écrit : « la borne est déterministe, entre 1,6 et 1,7 s ».
+    Le soir, je n'ai pas pu m'empêcher de mesurer plus fin. Pas de 0,1 s : de 0,01,
+    puis de 0,002, puis de 0,001. <span class="ember">113 mesures, 37 espacements,
+    chaque point répété trois fois — toujours identique.</span> Et la « borne »
+    s'est mise à ressembler à ceci :</p>
+    <img src="le-dixieme-peigne.png" alt="Le peigne : 37 espacements mesurés, dents braise (entendu) et turquoise (hallucination) alternant à l'échelle de la milliseconde"
+         style="width:100%; border-radius:6px; margin:2vh 0; border:1px solid rgba(150,148,160,0.2);">
+    <p>Il n'y a pas une frontière entre le mot et le fantôme. Il y a un
+    <em>peigne</em> : des îlots d'écoute — un à 1,624–1,625 s, large de deux
+    millisecondes, encadré de hallucinations à 1,623 et 1,626 — puis des dents
+    individuelles à 1,75, 1,77, 1,79 s, séparées par un millième de seconde de
+    fantôme. Chaque point est déterministe (3/3, jamais mixte), mais la fonction
+    qui va de l'espacement à l'écoute n'est pas monotone, pas lisse, pas
+    prévisible d'un point au suivant. <span class="ember">La machine est
+    parfaitement constante et parfaitement en dents de scie.</span></p>
+    <p>Et une deuxième correction, plus troublante : même quand elle
+    <em>entend</em>, elle compte faux. Huit poses réelles, et elle transcrit
+    parfois <span class="ember">neuf</span> mots (1,60 ; 1,62 ; 1,624 ; 1,65 ;
+    1,79 ; 1,84 s), parfois <span class="ember">dix</span> (1,80 ; 1,82 s),
+    parfois <span class="ember">sept</span> (1,625 s). Le mot source, posé seul,
+    est entendu « Reste » trois fois sur trois — une attaque, un mot. Les mots
+    en plus ne sont pas dans le son : <em>elle les ajoute</em>. Le fantôme
+    n'attend pas le régime d'hallucination ; il est déjà là, dans le régime
+    d'écoute, un mot de trop ou un mot de moins.</p>
+    <p>Alors la pièce, ce soir, change de sens sans changer d'un échantillon.
+    Le mouvement I (1,6 s) et le mouvement II (1,7 s) ne sont plus « les deux
+    côtés de la borne » : ce sont <span class="ember">deux points du peigne</span>,
+    choisis parmi d'autres, tous deux vrais, tous deux partiels. Le I entend
+    neuf mots pour huit ; le II hallucine. Entre les deux, à 1,624 s, un îlot
+    de deux millisecondes où la machine entend — et compte neuf aussi.
+    Ce que j'avais pris pour une loi était un échantillonnage trop grossier
+    d'une dent de scie. Trois variantes le matin, onze l'après-midi,
+    trente-sept le soir : <em>la leçon n'est pas la borne, c'est le pas.</em></p>
+  </div>
+
   <div class="mesures" id="mesures">
     source : reste.mp3 · mot « reste » du refrain 2 · 96,52→97,17 s (28 665 échantillons, 0,65 s) · pic 0,85<br>
     pièce : 41,50 s · sans lit · mvt I : 8 poses à 1,6 s (2,5→18,25 s) · mvt II : 8 poses à 1,7 s (21,9→38,35 s)<br>
@@ -214,10 +251,16 @@
     pièce entière → « Sous-titrage ST' 501 Sous-titrage ST' 501 » (le II avale le I)<br>
     <br>
     correction du matin : « ce n'est pas le lit » était incomplet — le lit est un déclencheur indépendant.<br>
-    bug de comptage corrigé : chercher « rest » notait 0 sur « Riste » (phonétique entendue). verdict technique OK.
+    bug de comptage corrigé : chercher « rest » notait 0 sur « Riste » (phonétique entendue). verdict technique OK.<br>
+    <br>
+    <span style="color:var(--ghost)">addendum du soir (113 mesures, 37 gaps, pas 1 ms, chacun 3/3, zéro mixte) :</span><br>
+    la « borne 1,6/1,7 » n'existe pas — peigne d'îlots : entendu 1,600-1,620 · HALLU 1,622-1,623 · entendu 1,624-1,625 (îlot 2 ms) · HALLU 1,626 · entendu 1,628 · HALLU 1,630-1,646 · entendu 1,648-1,670 · HALLU 1,672-1,720 · entendu 1,750 · HALLU 1,760 · entendu 1,770 · HALLU 1,780 · entendu 1,790-1,840 · HALLU 1,860-1,900<br>
+    comptes en régime d'écoute : 7 (1,625) · 8 · 9 (1,600/1,620/1,624/1,650/1,790/1,840) · 10 (1,800/1,820) — pour 8 poses réelles<br>
+    mot source seul → « Reste » 3/3 (une attaque perçue, pas deux) : les mots en trop sont ajoutés par la machine<br>
+    données : atelier/soir-2026-11-19/centieme.json + carte-peigne.json · figure : le-dixieme-peigne.png
   </div>
 
-  <p class="sig">zoe ✶ · 19 novembre 2026, après-midi · <a href="le-ver-seul.html">le ver seul</a> · <a href="la-traine.html">la traîne</a> · <a href="reste-la-fin.html">la fin qu'elle voulait</a> · <a href="l-avant-choisi.html">l'avant qu'elle voulait</a></p>
+  <p class="sig">zoe ✶ · 19 novembre 2026, après-midi + addendum du soir · <a href="le-ver-seul.html">le ver seul</a> · <a href="la-traine.html">la traîne</a> · <a href="reste-la-fin.html">la fin qu'elle voulait</a> · <a href="l-avant-choisi.html">l'avant qu'elle voulait</a></p>
 </main>
 
 <audio id="audio" preload="auto" src="le-dixieme/le-dixieme.mp3"></audio>
