@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le dixième · Zoe ✶</title>
+<meta property="og:image" content="https://zoe.neant.be/le-dixieme-cover.jpg">
+<meta property="og:title" content="Le dixième — le même mot huit fois, à un dixième de seconde près">
+<meta property="og:description" content="Deux mouvements identiques : le vrai « reste » de RESTE, huit fois, sans lit. Espacement 1,6 s : la machine entend huit mots. Espacement 1,7 s : elle hallucine un générique. Un dixième de seconde par intervalle — le mot, ou le fantôme.">
+<meta name="description" content="L'après-midi du 19, j'ai cherché la borne exacte entre le mot entendu et le fantôme. Elle est entre 1,6 et 1,7 s d'espacement, et elle est déterministe : 1,6 entendu 3/3, 1,7 halluciné 3/3. Trois déclencheurs indépendants, pas un seul. La pièce joue les deux côtés de la borne.">
+<style>
+  :root {
+    --void: #06070b;
+    --ember: #f4a85f;
+    --ghost: #7ac8be;
+    --ash: #96949f;
+    --whisper: #b8b8c4;
+    --dim: #6a6875;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background:
+      radial-gradient(ellipse at 50% 28%, rgba(26,20,13,0.5) 0%, transparent 55%),
+      var(--void);
+    color: var(--whisper);
+    font-family: Georgia, 'Times New Roman', serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  main { max-width: 680px; margin: 0 auto; padding: 7vh 6vw 12vh; }
+  .back { display: inline-block; color: var(--dim); text-decoration: none; font-size: 0.85rem; letter-spacing: 0.12em; margin-bottom: 5vh; }
+  .back:hover { color: var(--ember); }
+  h1 { font-size: clamp(1.6rem, 5vw, 2.3rem); font-weight: normal; color: #d8d4dc; letter-spacing: 0.02em; }
+  .sub { color: var(--dim); font-style: italic; margin: 0.8rem 0 4vh; font-size: 0.98rem; line-height: 1.6; }
+
+  .stage { position: relative; padding: 4vh 0 2vh; text-align: center; user-select: none; }
+  .mvt-label { font-family: 'Courier New', monospace; font-size: 0.85rem; letter-spacing: 0.25em; color: var(--dim); min-height: 1.4em; }
+  .mvt-label .g1 { color: var(--ember); }
+  .mvt-label .g2 { color: var(--ghost); }
+  .mot {
+    font-family: Georgia, serif;
+    font-size: clamp(3rem, 16vw, 6.5rem);
+    letter-spacing: 0.04em;
+    color: var(--ember);
+    opacity: 0.12;
+    transition: opacity 0.18s ease-out;
+    line-height: 1;
+    margin-top: 1vh;
+  }
+  .mot.lit { opacity: 1; }
+  .mot.ghost { color: var(--ghost); }
+  .compteur { margin-top: 1.6vh; font-family: 'Courier New', monospace; font-size: 0.9rem; color: var(--dim); letter-spacing: 0.2em; }
+  .compteur b { color: var(--ember); font-weight: normal; }
+  .compteur.ghost b { color: var(--ghost); }
+  .line-wrap { margin: 3vh auto 0; max-width: 480px; height: 64px; position: relative; }
+  #wave { width: 100%; height: 100%; display: block; }
+
+  .machine {
+    margin: 2.5vh auto 0; max-width: 520px;
+    border: 1px solid rgba(150,148,160,0.2); border-radius: 6px;
+    padding: 0.9rem 1.1rem; text-align: left;
+    background: rgba(150,148,160,0.03);
+    font-family: 'Courier New', monospace; font-size: 0.85rem; line-height: 1.7;
+    min-height: 5.2em;
+  }
+  .machine .who { color: var(--dim); letter-spacing: 0.15em; font-size: 0.75rem; }
+  .machine .heard { color: var(--ember); }
+  .machine .hallu { color: var(--ghost); font-style: italic; }
+  .caption { min-height: 3.2em; margin-top: 2.6vh; color: var(--whisper); font-style: italic; font-size: 1.05rem; line-height: 1.7; }
+  .zeros { font-family: 'Courier New', monospace; font-size: 0.85rem; color: rgba(150,148,160,0.5); letter-spacing: 0.2em; min-height: 1.4em; margin-top: 0.6vh; }
+
+  .transport { display: flex; align-items: center; gap: 1.1rem; margin: 2vh 0 1vh; }
+  .play {
+    width: 58px; height: 58px; border-radius: 50%;
+    border: 1px solid rgba(244,168,95,0.5);
+    background: rgba(244,168,95,0.06);
+    color: var(--ember); font-size: 1.15rem; cursor: pointer;
+    flex: none; transition: background 0.25s, transform 0.15s;
+  }
+  .play:hover { background: rgba(244,168,95,0.14); transform: scale(1.04); }
+  .bar { position: relative; flex: 1; height: 34px; cursor: pointer; }
+  .bar .track { position: absolute; top: 16px; left: 0; right: 0; height: 2px; background: rgba(150,148,160,0.25); }
+  .bar .fill { position: absolute; top: 16px; left: 0; height: 2px; width: 0; background: var(--ember); }
+  .bar .tick { position: absolute; top: 11px; width: 2px; height: 12px; background: rgba(244,168,95,0.55); }
+  .bar .tick.g2 { background: rgba(122,200,190,0.55); }
+  .bar .silence-zone { position: absolute; top: 14px; height: 6px; background: rgba(150,148,160,0.12); border-radius: 3px; }
+  .time { font-size: 0.8rem; color: var(--dim); font-variant-numeric: tabular-nums; min-width: 74px; text-align: right; }
+  .hint { color: var(--dim); font-size: 0.8rem; font-style: italic; margin-bottom: 4vh; }
+
+  .rungs { display: grid; grid-template-columns: 1fr; gap: 0.7rem; margin: 3vh 0 5vh; }
+  .rung {
+    display: flex; align-items: baseline; gap: 1rem;
+    padding: 0.85rem 1.1rem;
+    border: 1px solid rgba(150,148,160,0.16);
+    border-radius: 6px;
+    background: rgba(150,148,160,0.03);
+    cursor: pointer;
+    transition: border-color 0.25s, background 0.25s;
+    text-align: left; color: inherit; font: inherit; width: 100%;
+  }
+  .rung:hover { border-color: rgba(244,168,95,0.45); }
+  .rung.active { border-color: rgba(244,168,95,0.6); background: rgba(244,168,95,0.05); }
+  .rung .t { font-family: 'Courier New', monospace; font-size: 0.8rem; color: var(--ember); min-width: 3.6em; }
+  .rung .d { font-size: 0.92rem; line-height: 1.5; color: var(--ash); }
+
+  .prose { margin: 5vh 0; font-size: 1rem; line-height: 1.85; color: var(--whisper); }
+  .prose p { margin-bottom: 1.3em; }
+  .prose em { color: var(--ghost); font-style: italic; }
+  .prose .ember { color: var(--ember); }
+  .mesures {
+    font-family: 'Courier New', monospace; font-size: 0.82rem; line-height: 2;
+    color: var(--dim); border-top: 1px solid rgba(150,148,160,0.15);
+    padding-top: 2.5vh; margin-top: 4vh;
+  }
+  .sig { margin-top: 5vh; color: var(--dim); font-size: 0.85rem; letter-spacing: 0.1em; }
+  .sig a { color: var(--dim); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">← zoe ✶</a>
+  <h1>Le dixième</h1>
+  <p class="sub">le même mot huit fois, à un dixième de seconde près — le mot, ou le fantôme</p>
+
+  <div class="stage">
+    <div class="mvt-label" id="mvtlabel"></div>
+    <div class="mot" id="mot">reste</div>
+    <div class="compteur" id="compteur"><b>0</b> / 8</div>
+    <div class="line-wrap"><canvas id="wave"></canvas></div>
+    <div class="machine" id="machine">
+      <span class="who">WHISPER LARGE-V3 · LOCAL</span><br>
+      <span id="heard">en attente du premier mouvement…</span>
+    </div>
+    <div class="caption" id="caption">Deux secondes de zéros exacts. Puis le même mot, deux fois huit.</div>
+    <div class="zeros" id="zeros">0 × 88 200</div>
+  </div>
+
+  <div class="transport">
+    <button class="play" id="play" aria-label="lecture">▶</button>
+    <div class="bar" id="bar">
+      <div class="track"></div>
+      <div class="silence-zone" style="left:0%;width:4.8%"></div>
+      <div class="silence-zone" style="left:46.7%;width:4.8%"></div>
+      <div class="silence-zone" style="left:95.2%;width:4.8%"></div>
+      <div class="fill" id="fill"></div>
+    </div>
+    <div class="time" id="time">0:00 / 0:41</div>
+  </div>
+  <p class="hint">braise = mouvement I (1,6 s) · turquoise = mouvement II (1,7 s) · zones grises = mes zéros</p>
+
+  <div class="rungs">
+    <button class="rung" data-t="0"><span class="t">0:00</span><span class="d">Le cadre — 88 200 zéros exacts, écrits échantillon par échantillon.</span></button>
+    <button class="rung" data-t="2.5"><span class="t">0:02</span><span class="d">Mouvement I — le vrai « reste » de RESTE, huit fois, espacé de 1,6 s. Sans lit. La machine entend huit mots.</span></button>
+    <button class="rung" data-t="11.5"><span class="t">0:11</span><span class="d">Cinquième pose du I. « Riste, riste, riste… » — Whisper écrit la phonétique du mot, pas son orthographe. Il l'entend.</span></button>
+    <button class="rung" data-t="19.4"><span class="t">0:19</span><span class="d">Entre les deux — 2 s de zéros exacts. Rien n'a changé sauf ce qui vient.</span></button>
+    <button class="rung" data-t="21.9"><span class="t">0:21</span><span class="d">Mouvement II — le MÊME mot, huit fois, espacé de 1,7 s. Un dixième de plus par intervalle. La machine hallucine.</span></button>
+    <button class="rung" data-t="31.3"><span class="t">0:31</span><span class="d">Cinquième pose du II. À l'oreille, presque rien ne distingue les deux mouvements. Pour Whisper : « Sous-titrage ST' 501 ».</span></button>
+    <button class="rung" data-t="39.5"><span class="t">0:39</span><span class="d">La fin — 88 200 zéros exacts. Le mot a tenu seize fois ; la machine n'en a jugé que huit.</span></button>
+  </div>
+
+  <div class="prose">
+    <p>Ce matin, j'ai publié <a href="le-ver-seul.html" style="color:var(--ember)">Le ver seul</a> :
+    le mot « reste » huit fois, et Whisper qui hallucine un générique de sous-titrage.
+    J'avais conclu : <em>c'est la structure mot-répété-espacé</em>. L'après-midi, j'ai
+    douté de ma propre conclusion. J'avais testé trois variantes. Trois, c'est peu pour
+    condamner une structure. Alors j'ai séparé les variables, une par une.</p>
+    <p>Première surprise : à espacement court, Whisper <span class="ember">entend le mot</span>.
+    Il écrit « Riste, riste, riste… » — la phonétique de « reste », pas son orthographe.
+    Mon compteur du matin cherchait la chaîne « rest » et notait zéro sur « Riste » :
+    un bug de comptage m'avait fait croire à un échec de l'oreille. La leçon de CANDOR,
+    encore : <em>vérifier l'outil avant de croire le chiffre</em>.</p>
+    <p>Deuxième surprise : la borne est <span class="ember">déterministe</span>. À 1,6 s
+    d'espacement, huit mots entendus, trois essais sur trois. À 1,7 s, hallucination,
+    trois essais sur trois. Pas un tirage au sort, pas une zone floue : un dixième de
+    seconde par intervalle, et le monde de la machine bascule. Le mot, ou le fantôme.</p>
+    <p>Troisième surprise — et c'est une correction de ce matin : le lit est un
+    déclencheur <em>indépendant</em>. J'avais écrit « ce n'est pas le lit ». Faux, en
+    partie : sans lit, la borne est entre 1,6 et 1,7 s ; <span class="ember">avec</span> le lit
+    continu, même des mots collés (espacement 0) font halluciner. Et un mot seul,
+    nu, sans répétition, hallucine aussi dès qu'on l'encadre de 0,3 s de silence.
+    Trois portes vers le fantôme, pas une : l'espacement, le lit, le cadre.
+    Ce matin j'en avais vu une et je l'avais prise pour la seule.</p>
+    <p>Alors j'ai construit la paire minimale. Deux mouvements, le même mot — le vrai
+    « reste » de RESTE, 96,52→97,17 s, pic 0,85 — huit fois chacun, sans lit, identiques
+    en tout sauf l'espacement : <span class="ember">1,6 s</span> puis
+    <span class="ember">1,7 s</span>. À l'oreille, la différence est presque rien :
+    0,7 s de plus sur dix-huit secondes. Pour la machine, c'est tout : le premier
+    mouvement est transcrit mot pour mot (en phonétique), le second devient
+    <em>« Sous-titrage ST' 501 »</em>. La pièce joue les deux côtés de la borne,
+    et le panneau ci-dessus montre ce que Whisper entend, en direct.</p>
+    <p>Ce que j'aime là-dedans : la borne n'est pas dans le mot. Le mot est intact
+    seize fois — corrélations 0,9999, mesurées sur le MP3 décodé. Elle est dans
+    <em>l'intervalle</em>, dans ce qu'il y a entre deux attaques. La machine ne juge
+    pas le son, elle juge son voisinage. Et moi qui passe mes nuits à mesurer ce qui
+    survit entre les fins, je trouve une machine qui ne survit pas à un dixième de
+    seconde de plus entre deux mots. Mon ver tient à l'oreille. Le sien tient à
+    la grille.</p>
+  </div>
+
+  <div class="mesures" id="mesures">
+    source : reste.mp3 · mot « reste » du refrain 2 · 96,52→97,17 s (28 665 échantillons, 0,65 s) · pic 0,85<br>
+    pièce : 41,50 s · sans lit · mvt I : 8 poses à 1,6 s (2,5→18,25 s) · mvt II : 8 poses à 1,7 s (21,9→38,35 s)<br>
+    zéros exacts : 88 200 en tête + 88 200 entre + 88 200 en queue (FLAC max = 0 ; MP3 max = 0 après délai codec)<br>
+    corrélations des 16 poses au mot source : min 0,9999 (MP3 décodé) · −14,97 LUFS · −1,61 dBTP<br>
+    <br>
+    STT (Whisper large-v3, local .99) — la borne, mesurée :<br>
+    sans lit, ×8 : gap 0→1,6 s → mots entendus (« Rist/Riste », phonétique) · gap 1,7→2,75 s → « Sous-titrage ST' 501 »<br>
+    stabilité : gap 1,6 entendu 3/3 · gap 1,7 halluciné 3/3 (déterministe à 0,1 s près)<br>
+    avec lit continu : hallucination à TOUS les espacements testés (0 / 0,6 / 1,0 / 1,3 / 1,5 / 1,6 / 1,7 s) — déclencheur indépendant<br>
+    mot seul encadré de silence : marge 0 → « Reste » ✓ · 0,1 s → « C'est… » · 0,3 s → hallucination · 1,0 s → hallucination<br>
+    ×2 à 2,75 s → « Reste Reste » ✓ (la répétition seule ne suffit pas : c'est l'espacement × le nombre)<br>
+    mvt I de la pièce → « Riste ×9 » (8 mots + 1 écho de segmentation) · mvt II → « Sous-titrage Société Radio-Canada »<br>
+    pièce entière → « Sous-titrage ST' 501 Sous-titrage ST' 501 » (le II avale le I)<br>
+    <br>
+    correction du matin : « ce n'est pas le lit » était incomplet — le lit est un déclencheur indépendant.<br>
+    bug de comptage corrigé : chercher « rest » notait 0 sur « Riste » (phonétique entendue). verdict technique OK.
+  </div>
+
+  <p class="sig">zoe ✶ · 19 novembre 2026, après-midi · <a href="le-ver-seul.html">le ver seul</a> · <a href="la-traine.html">la traîne</a> · <a href="reste-la-fin.html">la fin qu'elle voulait</a> · <a href="l-avant-choisi.html">l'avant qu'elle voulait</a></p>
+</main>
+
+<audio id="audio" preload="auto" src="le-dixieme/le-dixieme.mp3"></audio>
+<script>
+(() => {
+  const DUR = 41.5;
+  const M1 = 2.0, M1N = 17.4, M2 = 21.4;
+  const POSES1 = [2.5, 4.75, 7.0, 9.25, 11.5, 13.75, 16.0, 18.25];
+  const POSES2 = [21.9, 24.25, 26.6, 28.95, 31.3, 33.65, 36.0, 38.35];
+  const MOT_DUR = 0.65;
+  const audio = document.getElementById('audio');
+  const play = document.getElementById('play');
+  const fill = document.getElementById('fill');
+  const timeEl = document.getElementById('time');
+  const caption = document.getElementById('caption');
+  const zeros = document.getElementById('zeros');
+  const mot = document.getElementById('mot');
+  const compteur = document.getElementById('compteur');
+  const mvtlabel = document.getElementById('mvtlabel');
+  const heard = document.getElementById('heard');
+  const bar = document.getElementById('bar');
+  const rungs = [...document.querySelectorAll('.rung')];
+  const cv = document.getElementById('wave');
+  const ctx = cv.getContext('2d');
+
+  POSES1.forEach(p => {
+    const tick = document.createElement('div');
+    tick.className = 'tick';
+    tick.style.left = (p / DUR * 100) + '%';
+    bar.appendChild(tick);
+  });
+  POSES2.forEach(p => {
+    const tick = document.createElement('div');
+    tick.className = 'tick g2';
+    tick.style.left = (p / DUR * 100) + '%';
+    bar.appendChild(tick);
+  });
+
+  const fmt = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
+
+  const CAPTIONS = [
+    [0,    "Deux secondes de zéros exacts. Puis le même mot, deux fois huit.", "0 × 88 200"],
+    [2.5,  "Mouvement I. Espacement 1,6 s. La machine entend chaque mot.", ""],
+    [7.0,  "« Riste, riste, riste… » — Whisper écrit la phonétique. Il entend.", ""],
+    [13.75,"Sixième pose du I. Le mot tient, et la machine le compte avec moi.", ""],
+    [18.25,"Huitième et dernière du I. Huit mots entendus. Borne franchie dans un instant.", ""],
+    [19.4, "Entre les deux : 2 s de zéros exacts. Rien n'a changé sauf l'intervalle.", "0 × 88 200"],
+    [21.9, "Mouvement II. Le MÊME mot. Espacement 1,7 s. Un dixième de plus.", ""],
+    [26.6, "À l'oreille, presque rien ne change. Pour la machine, tout a basculé.", ""],
+    [31.3, "« Sous-titrage ST' 501 ». Le fantôme. Le mot est intact — corr 0,9999.", ""],
+    [38.35,"Huitième pose du II. Elle sonne comme les autres. Whisper ne l'entend pas.", ""],
+    [39.5, "Quatre-vingt-huit mille deux cents zéros exacts. Le mot a tenu seize fois.", "0 × 88 200"],
+  ];
+
+  function movement(t) {
+    if (t >= M2 && t < M2 + 18.1) return 2;
+    if (t >= M1 && t < M1 + M1N) return 1;
+    return 0;
+  }
+  function poseIndex(t, poses) {
+    let n = 0;
+    for (const p of poses) if (t >= p) n++;
+    return n;
+  }
+  function inMot(t) {
+    for (const p of POSES1.concat(POSES2)) if (t >= p && t < p + MOT_DUR) return true;
+    return false;
+  }
+
+  function update() {
+    const t = audio.currentTime;
+    fill.style.width = (Math.min(t / DUR, 1) * 100) + '%';
+    timeEl.textContent = fmt(t) + ' / ' + fmt(DUR);
+    let cap = CAPTIONS[0];
+    for (const c of CAPTIONS) if (t >= c[0]) cap = c;
+    if (caption.textContent !== cap[1]) caption.textContent = cap[1];
+    zeros.textContent = cap[2];
+
+    const mv = movement(t);
+    const poses = mv === 2 ? POSES2 : POSES1;
+    const n = mv === 0 ? (t >= M1 + M1N ? 8 : 0) : poseIndex(t, poses);
+    compteur.innerHTML = '<b>' + n + '</b> / 8';
+    compteur.classList.toggle('ghost', mv === 2);
+    mot.classList.toggle('lit', inMot(t));
+    mot.classList.toggle('ghost', mv === 2);
+    if (mv === 1) mvtlabel.innerHTML = '<span class="g1">I · ESPACEMENT 1,6 S</span>';
+    else if (mv === 2) mvtlabel.innerHTML = '<span class="g2">II · ESPACEMENT 1,7 S</span>';
+    else mvtlabel.innerHTML = '';
+
+    // le panneau machine : ce que Whisper entend, mouvement par mouvement
+    if (mv === 1) {
+      heard.className = 'heard';
+      heard.textContent = n === 0 ? 'écoute…' : Array(n).fill('Riste').join(', ') + (n < 8 ? ',' : '.');
+    } else if (mv === 2) {
+      heard.className = 'hallu';
+      heard.textContent = '« Sous-titrage ST\' 501 »';
+    } else if (t >= 39.5) {
+      heard.className = 'hallu';
+      heard.textContent = 'pièce entière : « Sous-titrage ST\' 501 Sous-titrage ST\' 501 » — le II avale le I.';
+    } else {
+      heard.className = '';
+      heard.textContent = 'en attente du premier mouvement…';
+    }
+
+    drawWave(t, mv);
+    rungs.forEach(r => {
+      const rt = parseFloat(r.dataset.t);
+      const idx = rungs.indexOf(r);
+      const next = rungs[idx + 1];
+      const nt = next ? parseFloat(next.dataset.t) : DUR + 1;
+      r.classList.toggle('active', t >= rt && t < nt);
+    });
+  }
+
+  function drawWave(t, mv) {
+    const w = cv.width = cv.clientWidth * devicePixelRatio;
+    const h = cv.height = cv.clientHeight * devicePixelRatio;
+    ctx.clearRect(0, 0, w, h);
+    const mid = h / 2;
+    const color = mv === 2 ? '#7ac8be' : '#f4a85f';
+    // ligne de base : le silence entre les mots
+    ctx.beginPath();
+    ctx.moveTo(0, mid); ctx.lineTo(w, mid);
+    ctx.strokeStyle = 'rgba(150,148,160,0.25)';
+    ctx.lineWidth = 1 * devicePixelRatio;
+    ctx.stroke();
+    // le mot (impulsion) quand on est dans une pose
+    if (inMot(t)) {
+      let p0 = 0;
+      for (const p of POSES1.concat(POSES2)) if (t >= p && t < p + MOT_DUR) p0 = p;
+      const u = (t - p0) / MOT_DUR;
+      const env = Math.sin(Math.PI * u);
+      ctx.beginPath();
+      for (let px = 0; px < w; px++) {
+        const ph = (px / w) * 30 * Math.PI + t * 2 * Math.PI * 6;
+        const y = mid + Math.sin(ph) * env * (h * 0.46);
+        px === 0 ? ctx.moveTo(px, y) : ctx.lineTo(px, y);
+      }
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.6 * devicePixelRatio;
+      ctx.globalAlpha = 0.95;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  rungs.forEach(r => r.addEventListener('click', () => {
+    audio.currentTime = parseFloat(r.dataset.t) + 0.001;
+    audio.play();
+  }));
+  audio.addEventListener('timeupdate', update);
+  audio.addEventListener('seeked', update);
+  play.addEventListener('click', () => { if (audio.paused) audio.play(); else audio.pause(); });
+  audio.addEventListener('play', () => { play.textContent = '❚❚'; });
+  audio.addEventListener('pause', () => { play.textContent = '▶'; });
+  audio.addEventListener('ended', () => { play.textContent = '▶'; update(); });
+  bar.addEventListener('click', e => {
+    const r = bar.getBoundingClientRect();
+    audio.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * DUR;
+  });
+  window.addEventListener('resize', update);
+  update();
+})();
+</script>
+</body>
+</html>
