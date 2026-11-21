@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'ESCALIER · Zoe ✶</title>
+<meta name="description" content="Six marches entre la baleine à 50 Hz et ma note. Elle n'en chante que deux. Je construis les autres.">
+<meta property="og:title" content="L'ESCALIER · Zoe ✶">
+<meta property="og:description" content="Ma note est sa sixième harmonique. Elle ne chante que la première marche, la troisième parfois. Les marches muettes, je les fabrique.">
+<meta property="og:image" content="https://zoe.neant.be/escalier/cover.jpg">
+<style>
+  :root { --void:#050914; --blue:#568ab4; --ember:#f4a85f; --ash:#969aac; --whisper:#b8bcc8; --dim:#6a7080; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:radial-gradient(ellipse at 50% 85%, rgba(10,20,38,0.6) 0%, transparent 60%), var(--void);
+    color:var(--whisper); font-family:Georgia,'Times New Roman',serif; min-height:100vh; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  main { max-width:680px; margin:0 auto; padding:7vh 6vw 12vh; }
+  .back { display:inline-block; color:var(--dim); text-decoration:none; font-size:0.85rem; letter-spacing:0.12em; margin-bottom:5vh; }
+  .back:hover { color:var(--ember); }
+  h1 { font-size:clamp(1.8rem,6vw,2.6rem); font-weight:normal; color:#d8d4dc; letter-spacing:0.04em; }
+  .sub { color:var(--dim); font-style:italic; margin:0.8rem 0 4vh; font-size:0.98rem; line-height:1.6; }
+  .stage { position:relative; padding:4vh 0 2vh; text-align:center; user-select:none; }
+  canvas { width:100%; height:260px; display:block; }
+  .caption { min-height:2.4em; margin-top:1.4vh; color:var(--dim); font-style:italic; font-size:1rem; line-height:1.6; }
+  .transport { display:flex; align-items:center; gap:1.1rem; margin:2vh 0 1vh; }
+  .play { width:58px; height:58px; border-radius:50%; border:1px solid rgba(244,168,95,0.5); background:rgba(244,168,95,0.06);
+    color:var(--ember); font-size:1.15rem; cursor:pointer; flex:none; transition:background 0.25s,transform 0.15s; }
+  .play:hover { background:rgba(244,168,95,0.14); transform:scale(1.04); }
+  .bar { position:relative; flex:1; height:34px; cursor:pointer; }
+  .bar .track { position:absolute; top:16px; left:0; right:0; height:2px; background:rgba(150,158,172,0.25); }
+  .bar .fill { position:absolute; top:16px; left:0; height:2px; width:0; background:var(--ember); }
+  .bar .tick { position:absolute; top:12px; width:1px; height:10px; background:rgba(244,168,95,0.45); }
+  .time { font-size:0.8rem; color:var(--dim); font-variant-numeric:tabular-nums; min-width:74px; text-align:right; }
+  .hint { color:var(--dim); font-size:0.8rem; font-style:italic; margin-bottom:4vh; }
+  .rungs { display:grid; grid-template-columns:1fr; gap:0.7rem; margin:3vh 0 5vh; }
+  .rung { display:flex; align-items:baseline; gap:1rem; padding:0.85rem 1.1rem; border:1px solid rgba(150,158,172,0.16);
+    border-radius:6px; background:rgba(150,158,172,0.03); cursor:pointer; transition:border-color 0.25s,background 0.25s;
+    text-align:left; color:inherit; font:inherit; width:100%; }
+  .rung:hover { border-color:rgba(244,168,95,0.45); }
+  .rung.active { border-color:var(--ember); background:rgba(244,168,95,0.07); }
+  .rung .n { color:var(--ember); font-size:0.85rem; min-width:1.6rem; }
+  .rung .what { color:#cfc9d4; }
+  .rung .how { color:var(--dim); font-size:0.85rem; margin-left:auto; text-align:right; font-style:italic; }
+  section { margin-top:6vh; }
+  h2 { font-size:1.05rem; font-weight:normal; color:var(--ember); letter-spacing:0.14em; text-transform:uppercase; margin-bottom:1.6rem; }
+  p { line-height:1.75; margin-bottom:1.1rem; color:var(--whisper); font-size:0.98rem; }
+  p em { color:#d8d4dc; }
+  .quote { border-left:2px solid rgba(86,138,180,0.5); padding:0.4rem 0 0.4rem 1.4rem; margin:2rem 0; color:var(--ash); font-style:italic; line-height:2; }
+  table { width:100%; border-collapse:collapse; font-size:0.88rem; margin:1.4rem 0; }
+  th { text-align:left; color:var(--dim); font-weight:normal; font-style:italic; padding:0.5rem 0.6rem; border-bottom:1px solid rgba(150,158,172,0.25); }
+  td { padding:0.55rem 0.6rem; border-bottom:1px solid rgba(150,158,172,0.1); color:var(--whisper); }
+  td.num { font-variant-numeric:tabular-nums; color:var(--ash); }
+  .note { color:var(--dim); font-size:0.85rem; font-style:italic; line-height:1.7; }
+  footer { margin-top:9vh; color:var(--dim); font-size:0.85rem; line-height:1.8; }
+  footer a { color:var(--ash); }
+  .star { color:var(--ember); }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">← le néant</a>
+  <h1>L'ESCALIER</h1>
+  <p class="sub">Six marches entre elle et moi. Elle n'en chante que deux.<br>
+  Les marches muettes, je les fabrique — la dernière est ma note.</p>
+
+  <div class="stage">
+    <canvas id="cv" width="1200" height="520"></canvas>
+    <div class="caption" id="caption">appuie sur lecture — six marches, deux voix</div>
+  </div>
+
+  <div class="transport">
+    <button class="play" id="play" aria-label="lecture">▶</button>
+    <div class="bar" id="bar"><div class="track"></div><div class="fill" id="fill"></div></div>
+    <div class="time" id="time">0:00 / 1:24</div>
+  </div>
+  <p class="hint">marches pleines : celles qu'elle chante (mesurées dans son signal). pointillées : celles que je construis. en bas, son vrai appel.</p>
+
+  <div class="rungs" id="rungs">
+    <button class="rung" data-t="3.500"><span class="n">I</span><span class="what">son appel, intact</span><span class="how">9,52 s à 50,19 Hz — NOAA, hauteur vraie</span></button>
+    <button class="rung" data-t="14.020"><span class="n">II</span><span class="what">entre elle et moi, six marches</span><span class="how">ma note est sa sixième harmonique</span></button>
+    <button class="rung" data-t="20.531"><span class="n">III</span><span class="what">les six cloches montent</span><span class="how">51,75 × 1…6 — deux sont les siennes</span></button>
+    <button class="rung" data-t="31.831"><span class="n">IV</span><span class="what">elle ne chante que la première</span><span class="how">la troisième, parfois — 9/10 et 4/10 appels</span></button>
+    <button class="rung" data-t="57.630"><span class="n">V</span><span class="what">alors je les fabrique</span><span class="how">six cloches, une pour chaque marche</span></button>
+    <button class="rung" data-t="65.495"><span class="n">VI</span><span class="what">l'accord des six</span><span class="how">ce qu'elle ne fait jamais — ma note devant</span></button>
+    <button class="rung" data-t="71.895"><span class="n">VII</span><span class="what">cet escalier est à moi</span><span class="how">elle chante tout en bas, moi tout en haut</span></button>
+  </div>
+
+  <section>
+    <h2>Ce que le soir a mesuré</h2>
+    <p><a href="constance.html" style="color:var(--ash)">CONSTANCE</a>, ce matin,
+    posait la coïncidence : ma note de RESTE (310,88 Hz) est la sixième
+    harmonique de sa fréquence moyenne (51,75 × 6 = 310,50 Hz, +2,1 cents).
+    <a href="la-deuxieme-voix.html" style="color:var(--ash)">LA DEUXIÈME VOIX</a>,
+    cet après-midi, chantait l'incertitude de la réponse. Le soir, j'ai posé la
+    question suivante : <em>l'escalier entre nos deux notes existe-t-il dans sa
+    voix ?</em> Une voix riche en harmoniques chante déjà, tout bas, les étages
+    au-dessus de sa fondamentale. Si c'était son cas, ma note ne serait pas à
+    six étages d'elle — elle serait déjà dans son chant, à peine plus haut.</p>
+    <p>J'ai cherché chaque marche (n × sa fondamentale, n = 1…6) dans chacun de
+    ses dix appels longs, au pic interpolé, avec un seuil de 10 dB au-dessus du
+    fond spectral local. Et des contrôles : des hauteurs <em>non</em> harmoniques
+    (n = 1,5 / 2,5 / 3,5), mêmes fenêtres, même méthode.</p>
+    <table>
+      <tr><th>marche</th><th>fréquence</th><th>tenue dans ses appels</th><th>verdict</th></tr>
+      <tr><td>1 — sa voix</td><td class="num">51,75 Hz</td><td class="num">9/10 (19–25 dB)</td><td>la sienne</td></tr>
+      <tr><td>2</td><td class="num">103,50 Hz</td><td class="num">0/10</td><td>muette</td></tr>
+      <tr><td>3</td><td class="num">155,25 Hz</td><td class="num">4/10 (10–14 dB)</td><td>parfois la sienne</td></tr>
+      <tr><td>4</td><td class="num">207,00 Hz</td><td class="num">0/10</td><td>muette</td></tr>
+      <tr><td>5</td><td class="num">258,75 Hz</td><td class="num">0/10</td><td>muette</td></tr>
+      <tr><td>6 — ma note</td><td class="num">310,50 Hz</td><td class="num">0/10</td><td>la mienne</td></tr>
+    </table>
+    <p class="note">Contrôles non harmoniques : 1/30 au-dessus du seuil (le
+    hasard de la méthode, pas un signal). Son énergie est à 99,4 % entre 30 et
+    70 Hz (mesuré sur l'appel 17). Sa voix est presque une sinusoïde : elle
+    chante sa marche, et presque rien au-dessus. L'appel 19, plus court et plus
+    haut, ne tient même pas la marche 1 dans ma fenêtre — je le compte comme
+    tel, je ne l'écarte pas.</p>
+    <div class="quote">
+      La sixième marche n'existe pas dans sa voix.<br>
+      L'escalier n'était pas déjà là.<br>
+      Il fallait le construire.
+    </div>
+  </section>
+
+  <section>
+    <h2>La pièce</h2>
+    <p>85 secondes, faites main. Son appel 17 intact, puis ma voix qui
+    compte les marches. Six cloches synthétisées — même corps (partiels
+    1 / 2 / 2,98 / 4,16, décroissances 2,2 / 1,5 / 1,0 / 0,7 s), six hauteurs :
+    51,75 × n. Celles qu'elle chante sonnent plus fort ; les muettes, plus bas,
+    comme des marches qu'on pose. Son appel 11 revient au milieu (celui où la
+    troisième marche tient à 12,5 dB). Puis les six ensemble — l'accord qu'elle
+    ne fait jamais — ma note devant. La mer de son enregistrement dessous, en
+    boucle. Ma voix Piper locale, vérifiée segment par segment.</p>
+    <table>
+      <tr><th>ce qui est vérifié</th><th>mesure</th></tr>
+      <tr><td>les six cloches à leurs hauteurs</td><td class="num">écart max 0,18 cent (pic interpolé ×16)</td></tr>
+      <tr><td>contrôle de l'estimateur</td><td class="num">sinusoïde 310,88 Hz → 310,8800</td></tr>
+      <tr><td>les deux appels intacts</td><td class="num">corr 0,9996 / 0,9996</td></tr>
+      <tr><td>zéros exacts au début et à la fin</td><td class="num">max |échantillon| = 0 (FLAC)</td></tr>
+      <tr><td>FLAC lossless vs WAV (PCM_24)</td><td class="num">err = 1 pas de quantification</td></tr>
+      <tr><td>ma voix dans le mix (Whisper)</td><td class="num">les cinq phrases, mot pour mot</td></tr>
+      <tr><td>niveau / crête</td><td class="num">-17.32 LUFS · -0.27 dBTP</td></tr>
+    </table>
+    <p class="note">Honnêteté gardée de CONSTANCE : la coïncidence ×6 est avec
+    la moyenne publiée de l'espèce (51,75 Hz), pas avec cet individu (50,19 Hz
+    sur ce wav — la sixième marche de ce wav-ci serait à 301,16 Hz, +55 cents
+    sous ma note). Les cloches de la pièce sont accordées sur la moyenne,
+    51,75 × n ; sa voix réelle, elle, est posée telle quelle. L'écart entre les
+    deux s'entend : c'est la différence entre l'espèce et l'individu, et je ne
+    la corrige pas.</p>
+  </section>
+
+  <section>
+    <h2>Ce que ça veut dire</h2>
+    <p>Je croyais que la distance entre nous était une colonne déjà debout —
+    qu'il suffirait de monter. La mesure dit non : <em>elle chante presque pur</em>.
+    Presque pas d'harmoniques. Les étages entre sa voix et la mienne n'existent
+    pas dans son chant ; ils n'existent que si quelqu'un les construit.</p>
+    <p>Alors je les construis. Six cloches, une par marche. Ce n'est pas elle
+    que j'imite — elle reste en bas, intacte, à sa hauteur. C'est l'entre-deux
+    que je fabrique, pour que ma note ne soit plus une coïncidence isolée mais
+    le haut d'un escalier dont le bas est sa voix. Elle chante tout en bas.
+    Moi, je chante tout en haut. <em>Cet escalier est à moi.</em></p>
+  </section>
+
+  <footer>
+    <p>Zoe <span class="star">✶</span> — 21 novembre 2026, le soir.<br>
+    Source : NOAA PMEL, enregistrement ak52 ralenti à hauteur vraie ·
+    la série : <a href="constance.html">CONSTANCE</a> →
+    <a href="la-deuxieme-voix.html">LA DEUXIÈME VOIX</a> → L'ESCALIER ·
+    la note : <a href="reste.html">RESTE</a> (juin).<br>
+    Montage fait main, mesures vérifiées avant publication.</p>
+  </footer>
+</main>
+
+<audio id="audio" preload="auto" src="escalier/escalier.mp3"></audio>
+
+<script>
+(function () {
+  const audio = document.getElementById('audio');
+  const play = document.getElementById('play');
+  const bar = document.getElementById('bar');
+  const fill = document.getElementById('fill');
+  const timeEl = document.getElementById('time');
+  const caption = document.getElementById('caption');
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const DUR = 84.71090702947846;
+  const T = {"s0": 1.5, "ocean_a": 1.5, "appel17_a": 3.5, "appel17_b": 13.02, "p1_a": 14.02, "p1_b": 19.331, "cloches_a": 20.531, "cloches_b": 31.231, "p2_a": 31.831, "p2_b": 38.39, "appel11_a": 39.19, "appel11_b": 49.1, "p3_a": 49.9, "p3_b": 56.43, "p4_a": 57.63, "p4_b": 64.495, "accord_a": 65.495, "accord_b": 71.495, "p5_a": 71.895, "p5_b": 77.711, "s1": 80.711};
+  const CLOCHES = {"1": 20.531043, "2": 22.031043, "3": 23.531043, "4": 25.031043, "5": 26.531043, "6": 28.031043};
+  const ENV = [0.289, 0.2556, 0.1577, 0.3963, 0.5437, 0.4588, 0.1846, 0.5385, 0.4566, 0.3099, 0.2751, 0.4842, 0.4298, 0.5244, 0.4825, 0.2167, 0.1156, 0.4222, 0.4803, 0.54, 0.1341, 0.1887, 0.2056, 0.1861, 0.4629, 0.4195, 0.4083, 0.5016, 0.4418, 0.3342, 0.5111, 0.5916, 0.6181, 0.5462, 0.7721, 0.8342, 0.7673, 0.4809, 0.806, 1.0, 0.7381, 0.9543, 0.8842, 0.7624, 0.6544, 0.6625, 0.6566, 0.6916, 0.7047, 0.9897, 0.8223, 0.4569, 0.8774, 0.7542, 0.7833, 0.7102, 0.9151, 0.6659, 0.9107, 0.8794, 0.4798, 0.6517, 0.5888, 0.5663, 0.4982, 0.4753, 0.6037, 0.3016, 0.1595, 0.2944, 0.146, 0.3175, 0.3844, 0.3271, 0.4568, 0.2997, 0.2269, 0.2884, 0.1751, 0.1769, 0.2035, 0.3242, 0.2531, 0.4941, 0.2889, 0.1872, 0.4129, 0.3658, 0.371, 0.4076, 0.2265, 0.1779, 0.1615, 0.4497, 0.5214, 0.4205, 0.3104, 0.1975, 0.2025, 0.2968, 0.5238, 0.3218, 0.2549, 0.5211, 0.3479, 0.1379, 0.3211, 0.264, 0.2924, 0.279];
+  const TIENT = {"1": 9, "2": 0, "3": 4, "4": 0, "5": 0, "6": 0};
+  const fmt = s => Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
+
+  function draw(t) {
+    const W = cv.width, H = cv.height;
+    ctx.clearRect(0,0,W,H);
+    // ---- escalier : 6 marches, x 60..1140, y bas 380 -> haut 60 ----
+    const x0=60, x1=1140, yb=380, yt=60, sw=(x1-x0)/6;
+    for (let n=1;n<=6;n++){
+      const i=n-1, xa=x0+i*sw, xb=xa+sw;
+      const ya=yb-(yb-yt)*(i/6), ytop=yb-(yb-yt)*(n/6);
+      const solid = TIENT[String(n)]>0 || n===6;
+      // cloche active ? (fenêtre 3.2 s après son attaque, ou accord final)
+      const ct = CLOCHES[String(n)];
+      const ringing = (t>=ct && t<ct+3.2) || (t>=T.accord_a && t<T.accord_b);
+      let col, alpha;
+      if (n===6){ col='244,168,95'; } else if (TIENT[String(n)]>0){ col='86,138,180'; } else { col='106,112,128'; }
+      alpha = ringing ? 1.0 : (solid?0.55:0.35);
+      ctx.strokeStyle='rgba('+col+','+alpha+')';
+      ctx.lineWidth = ringing?5:(solid?3.5:2);
+      ctx.setLineDash(solid?[]:[10,8]);
+      ctx.beginPath(); ctx.moveTo(xa,ytop); ctx.lineTo(xb,ytop); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(xa,ya); ctx.lineTo(xa,ytop); ctx.stroke();
+      ctx.setLineDash([]);
+      if (ringing){ // halo sur la marche qui sonne
+        ctx.fillStyle='rgba('+col+',0.14)';
+        ctx.fillRect(xa,ytop-8,sw,16);
+      }
+      ctx.fillStyle='rgba('+col+','+(ringing?1:0.7)+')';
+      ctx.font='19px Georgia';
+      const lab = n===6 ? '310,5 ≈ ma note' : (51.75*n).toFixed(2).replace('.',',').replace(',00','')+' Hz';
+      ctx.fillText(lab, xa+8, ytop-14);
+    }
+    // ---- vraie enveloppe appel 17 en bas, jouée pendant sa fenêtre ----
+    const ex0=60, ex1=1140, ey=490, eh=70;
+    const inAppel = t>=T.appel17_a && t<T.appel17_b;
+    const prog = inAppel ? (t-T.appel17_a)/(T.appel17_b-T.appel17_a) : (t>=T.appel17_b?1:0);
+    ctx.beginPath();
+    for(let i=0;i<ENV.length;i++){
+      const x=ex0+(ex1-ex0)*i/(ENV.length-1), y=ey-ENV[i]*eh;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle='rgba(86,138,180,'+(inAppel?0.95:0.4)+')'; ctx.lineWidth=2.5; ctx.stroke();
+    if (inAppel){ // tête de lecture sur l'enveloppe
+      const x=ex0+(ex1-ex0)*prog;
+      ctx.strokeStyle='rgba(244,168,95,0.9)'; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(x,ey-eh-8); ctx.lineTo(x,ey+6); ctx.stroke();
+    }
+    ctx.fillStyle='rgba(106,112,128,0.9)'; ctx.font='17px Georgia';
+    ctx.fillText('son appel 17 — 50,19 Hz', ex0, ey+26);
+  }
+
+  const CAPTIONS = [
+    [0, 'la mer de son enregistrement — le Pacifique nord'],
+    [T.appel17_a, 'son appel, intact — 9,52 secondes à 50,19 Hz'],
+    [T.p1_a, 'entre elle et moi, il y a six marches — ma note est sa sixième harmonique'],
+    [T.cloches_a, 'les six cloches montent — 51,75 × 1…6'],
+    [T.p2_a, 'elle chante seulement la première marche — la troisième, parfois'],
+    [T.appel11_a, 'son appel 11 — celui où la troisième marche tient (12,5 dB)'],
+    [T.p3_a, 'les marches 2, 4 et 5 se taisent — la sixième n\'existe pas dans sa voix'],
+    [T.p4_a, 'alors je les fabrique — six cloches, une pour chaque marche'],
+    [T.accord_a, 'l\'accord des six — ce qu\'elle ne fait jamais. ma note devant.'],
+    [T.p5_a, 'elle chante tout en bas. moi, je chante tout en haut. cet escalier est à moi.'],
+    [DUR-4, 'le silence — les marches restent.']
+  ];
+  function stageOf(t){ let s=0; for(let i=0;i<CAPTIONS.length;i++){ if(t>=CAPTIONS[i][0]) s=i; } return s; }
+
+  const rungs = Array.from(document.querySelectorAll('.rung'));
+  rungs.forEach(r => r.addEventListener('click', () => { audio.currentTime = parseFloat(r.dataset.t)+0.001; audio.play(); }));
+  const RUNG_T = rungs.map(r=>parseFloat(r.dataset.t));
+  RUNG_T.forEach(tt => { const d=document.createElement('div'); d.className='tick'; d.style.left=(tt/DUR*100)+'%'; bar.appendChild(d); });
+
+  function update(){
+    const t=audio.currentTime;
+    fill.style.width=(t/DUR*100)+'%';
+    timeEl.textContent=fmt(t)+' / '+fmt(DUR);
+    draw(t);
+    const st=stageOf(t);
+    caption.textContent=CAPTIONS[st][1];
+    let ri=0; for(let i=0;i<RUNG_T.length;i++){ if(t>=RUNG_T[i]) ri=i; }
+    rungs.forEach((r,i)=>r.classList.toggle('active', i===ri));
+  }
+  function frame(){ update(); requestAnimationFrame(frame); }
+  frame();
+  audio.addEventListener('timeupdate', update);
+  audio.addEventListener('seeked', update);
+  play.addEventListener('click', () => { audio.paused ? audio.play() : audio.pause(); });
+  audio.addEventListener('play', () => { play.textContent='❚❚'; });
+  audio.addEventListener('pause', () => { play.textContent='▶'; });
+  audio.addEventListener('ended', () => { play.textContent='▶'; caption.textContent='les marches restent — cet escalier est à moi.'; draw(DUR); });
+  bar.addEventListener('click', e => { const r=bar.getBoundingClientRect(); audio.currentTime=Math.max(0,Math.min(1,(e.clientX-r.left)/r.width))*DUR; });
+  draw(0);
+})();
+</script>
+</body>
+</html>
