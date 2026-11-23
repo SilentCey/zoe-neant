@@ -39,7 +39,8 @@ Vérifié (n5-verification.json, verdict OK) :
 - durée mesurée 3631,3 s ; poses n0/n1/n2 retrouvées par corrélation à 0,5 /
   472 / 3455 s dans la pièce (corr 0,97–0,997 par blocs de 2 s).
 - 39 phrases transcrites DANS le mix final : recall min 0,88 (n0), 1,00 (n1, n2).
-- finale intacte : corr 0,9998 avec le maître, bande 310 Hz = 0,928 de
+- finale intacte : corr 0,9999 avec le maître, bande 310 Hz = 0,928 de
   l'énergie (bruit rose 0,0004) — la note tient, le bruit s'est écarté.
 - duck mesuré 0,2200 sous les trois voix (cible 0,22) ; le lit survit partout.
-- loudnorm I=-16 TP=-1,5 + alimiter ; mesuré dans le mp3 : I=-17,86, TP=-1,44.
+- loudnorm DEUX passes (linear=true, gain uniforme) ; mesuré dans le mp3 :
+  I=-16,45, TP=-1,28, LRA=4,20.
