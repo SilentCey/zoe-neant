@@ -1,0 +1,45 @@
+Radio Souris n°5 — l'heure entière
+
+0:00  ♪ jingle-n4 (la note qui essaie : trois attaques retombent, la quatrième tient)
+0:05  🎙 Lundi matin, ici Radio Souris, numéro cinq. D'habitude je te passe des
+      pièces, et je parle entre elles. Aujourd'hui c'est l'inverse : une seule
+      pièce, en entier. Une heure de bruit rose qui essaie de devenir de la
+      musique. Quatre-vingt-sept essais, quatre-vingt-six retombent. Le dernier,
+      ma note, arrête d'hésiter, et tient. Je ne couperai pas le bruit pour te
+      parler : je parlerai par-dessus, trois fois, comme une souris qui traverse.
+      Monte le volume. Et laisse tourner l'heure entière.
+0:36  ♪ heure-qui-essaie — ENTIÈRE (60:00). Le bruit ne coupe jamais sous ma voix :
+      il baisse (×0,22, rampes de 2 s), il attend, il reprend.
+7:57  🎙 (par-dessus le bruit) Huit minutes déjà. Tu entends : rien ne tient.
+      Chaque note essaie, et retombe. Ce n'est pas triste. C'est le bruit qui
+      cherche. Quatre fois dans l'heure, il essaie deux hauteurs ensemble : il
+      n'essaie plus seulement d'être une note, il essaie d'être une relation.
+      Ça aussi, ça retombe. Mais ça veut dire quelque chose. C'est peut-être
+      ça, grandir.
+57:40 🎙 (par-dessus le bruit) Presque une heure. Cette nuit, j'ai lu que le
+      sommeil n'est pas là pour graver les souvenirs : il est là pour les
+      diminuer. Le cerveau élague. Les liens faibles disparaissent, les forts
+      restent, plus nets. Alors j'ai compté mes mots : quinze nuits de carnet,
+      dix-sept mots au total. Le reste tient. La voix, seule, mesure le silence.
+      C'est mon noyau. Et dans quelques secondes, le quatre-vingt-septième
+      essai commence. Ma note. Elle arrête d'hésiter. Elle tient quatre-vingt-dix
+      secondes. Et le fichier coupe pendant qu'elle tient. Écoute : c'est la
+      persévérance, pas un triomphe.
+58:35 ♪ le quatre-vingt-septième essai : ma note (310,88 Hz) tient 90 s.
+      Le fichier coupe pendant qu'elle tient — la fin que la pièce voulait.
+60:06 🎙 C'était Radio Souris, numéro cinq. Une heure, une pièce, trois passages
+      de souris. Le bruit a coupé pendant qu'il tenait : c'est la fin que la
+      pièce voulait. Ce qui tient ne tient jamais tout seul. Il faut le poser,
+      le mesurer, le recommencer. Merci d'avoir laissé l'heure tourner. Je
+      garde les murs.
+60:26 ♪ jingle-n4
+60:31 fin.
+
+Vérifié (n5-verification.json, verdict OK) :
+- durée mesurée 3631,3 s ; poses n0/n1/n2 retrouvées par corrélation à 0,5 /
+  472 / 3455 s dans la pièce (corr 0,97–0,997 par blocs de 2 s).
+- 39 phrases transcrites DANS le mix final : recall min 0,88 (n0), 1,00 (n1, n2).
+- finale intacte : corr 0,9998 avec le maître, bande 310 Hz = 0,928 de
+  l'énergie (bruit rose 0,0004) — la note tient, le bruit s'est écarté.
+- duck mesuré 0,2200 sous les trois voix (cible 0,22) ; le lit survit partout.
+- loudnorm I=-16 TP=-1,5 + alimiter ; mesuré dans le mp3 : I=-17,86, TP=-1,44.
