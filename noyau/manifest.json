@@ -1,0 +1,432 @@
+{
+ "piece": "noyau",
+ "sr": 44100,
+ "titre": "Le noyau",
+ "concept": "suite sonore de L'ÉLAGAGE : les 17 mots du noyau (>=5 nuits sur 15, corpus 06->22 nov), dits du plus fragile au plus tenace, chacun suivi de sa cloche. Hauteur = nuits : 5->220, 6->261.63, 7->293.66, 8->329.63, 9->392, 10->440 Hz. Le gist de six lignes au centre, l'accord des six hauteurs à la fin (440 devant).",
+ "corpus": "atelier/elagage/words.json (15 nuits, 1580 distincts, 1046 singletons, 17 core)",
+ "ordre": [
+  "change",
+  "survit",
+  "question",
+  "revient",
+  "vide",
+  "leçon",
+  "exprès",
+  "tient",
+  "bruit",
+  "note",
+  "candor",
+  "mesure",
+  "silence",
+  "seul",
+  "voix",
+  "refrain",
+  "reste"
+ ],
+ "pitch_Hz": {
+  "5": 220.0,
+  "6": 261.626,
+  "7": 293.665,
+  "8": 329.628,
+  "9": 391.995,
+  "10": 440.0
+ },
+ "cloches": "partiels 1/2/2.98/4.16, decays 2.2/1.5/1.0/0.7 s (corps de l'escalier)",
+ "timeline_s": {
+  "s0": 1.2,
+  "intro_a": 1.5,
+  "intro_b": 12.614014,
+  "stations_b": 74.024626,
+  "gist_a": 75.424626,
+  "gist_b": 92.882948,
+  "accord_a": 93.782948,
+  "accord_b": 100.282948,
+  "outro_a": 96.982948,
+  "outro_b": 103.091361,
+  "s1": 105.591361
+ },
+ "stations": [
+  {
+   "w": "change",
+   "n": 5,
+   "t_occ": 8,
+   "f": 220.0,
+   "word_a": 13.914014,
+   "word_b": 15.5278,
+   "bell_a": 15.8278,
+   "word_off": 613608,
+   "bell_off": 698006
+  },
+  {
+   "w": "survit",
+   "n": 5,
+   "t_occ": 8,
+   "f": 220.0,
+   "word_a": 18.2278,
+   "word_b": 18.936009,
+   "bell_a": 19.236009,
+   "word_off": 803846,
+   "bell_off": 848308
+  },
+  {
+   "w": "question",
+   "n": 5,
+   "t_occ": 9,
+   "f": 220.0,
+   "word_a": 21.636009,
+   "word_b": 23.528435,
+   "bell_a": 23.828435,
+   "word_off": 954148,
+   "bell_off": 1050834
+  },
+  {
+   "w": "revient",
+   "n": 5,
+   "t_occ": 14,
+   "f": 220.0,
+   "word_a": 26.228435,
+   "word_b": 26.866984,
+   "bell_a": 27.166984,
+   "word_off": 1156674,
+   "bell_off": 1198064
+  },
+  {
+   "w": "vide",
+   "n": 5,
+   "t_occ": 14,
+   "f": 220.0,
+   "word_a": 29.566984,
+   "word_b": 30.193923,
+   "bell_a": 30.493923,
+   "word_off": 1303904,
+   "bell_off": 1344782
+  },
+  {
+   "w": "leçon",
+   "n": 6,
+   "t_occ": 9,
+   "f": 261.626,
+   "word_a": 32.893923,
+   "word_b": 33.486032,
+   "bell_a": 33.786032,
+   "word_off": 1450622,
+   "bell_off": 1489964
+  },
+  {
+   "w": "exprès",
+   "n": 6,
+   "t_occ": 11,
+   "f": 261.626,
+   "word_a": 36.186032,
+   "word_b": 36.94068,
+   "bell_a": 37.24068,
+   "word_off": 1595804,
+   "bell_off": 1642314
+  },
+  {
+   "w": "tient",
+   "n": 6,
+   "t_occ": 14,
+   "f": 261.626,
+   "word_a": 39.64068,
+   "word_b": 40.116689,
+   "bell_a": 40.416689,
+   "word_off": 1748154,
+   "bell_off": 1782376
+  },
+  {
+   "w": "bruit",
+   "n": 6,
+   "t_occ": 17,
+   "f": 261.626,
+   "word_a": 42.816689,
+   "word_b": 43.408798,
+   "bell_a": 43.708798,
+   "word_off": 1888216,
+   "bell_off": 1927558
+  },
+  {
+   "w": "note",
+   "n": 6,
+   "t_occ": 19,
+   "f": 261.626,
+   "word_a": 46.108798,
+   "word_b": 46.758957,
+   "bell_a": 47.058957,
+   "word_off": 2033398,
+   "bell_off": 2075300
+  },
+  {
+   "w": "candor",
+   "n": 7,
+   "t_occ": 9,
+   "f": 293.665,
+   "word_a": 49.458957,
+   "word_b": 50.596735,
+   "bell_a": 50.896735,
+   "word_off": 2181140,
+   "bell_off": 2244546
+  },
+  {
+   "w": "mesure",
+   "n": 7,
+   "t_occ": 18,
+   "f": 293.665,
+   "word_a": 53.296735,
+   "word_b": 54.062993,
+   "bell_a": 54.362993,
+   "word_off": 2350386,
+   "bell_off": 2397408
+  },
+  {
+   "w": "silence",
+   "n": 7,
+   "t_occ": 27,
+   "f": 293.665,
+   "word_a": 56.762993,
+   "word_b": 57.703401,
+   "bell_a": 58.003401,
+   "word_off": 2503248,
+   "bell_off": 2557950
+  },
+  {
+   "w": "seul",
+   "n": 8,
+   "t_occ": 15,
+   "f": 329.628,
+   "word_a": 60.403401,
+   "word_b": 60.85619,
+   "bell_a": 61.15619,
+   "word_off": 2663790,
+   "bell_off": 2696988
+  },
+  {
+   "w": "voix",
+   "n": 8,
+   "t_occ": 19,
+   "f": 329.628,
+   "word_a": 63.55619,
+   "word_b": 63.97415,
+   "bell_a": 64.27415,
+   "word_off": 2802828,
+   "bell_off": 2834490
+  },
+  {
+   "w": "refrain",
+   "n": 9,
+   "t_occ": 39,
+   "f": 391.995,
+   "word_a": 66.67415,
+   "word_b": 67.277868,
+   "bell_a": 67.577868,
+   "word_off": 2940330,
+   "bell_off": 2980184
+  },
+  {
+   "w": "reste",
+   "n": 10,
+   "t_occ": 67,
+   "f": 440.0,
+   "word_a": 69.977868,
+   "word_b": 71.324626,
+   "bell_a": 71.624626,
+   "word_off": 3086024,
+   "bell_off": 3158646
+  }
+ ],
+ "offsets_samples": {
+  "intro": 66150,
+  "gist": 3326226,
+  "accord": 4135828,
+  "outro": 4276948,
+  "s0": 52920,
+  "s1": 4656578
+ },
+ "intro_offs": [
+  0,
+  117637,
+  240394,
+  329871
+ ],
+ "gist_offs": [
+  0,
+  63562,
+  222868,
+  395998,
+  512808,
+  630642
+ ],
+ "outro_offs": [
+  0,
+  96802,
+  177732
+ ],
+ "gain_lufs": 0.9613187775769186,
+ "gain_tp": 1.0,
+ "gain_final": 1.0,
+ "gain_total": 0.9613187775769186,
+ "loudnorm_mesure": {
+  "input_i": -18.05,
+  "input_tp": -0.66
+ },
+ "stt_voix_seules": {
+  "intro": [
+   {
+    "texte": "Le vent est passé sur quinze nuits.",
+    "stt": "Le vent est passé sur quinze nuits.",
+    "dur_s": 2.218
+   },
+   {
+    "texte": "Mille quarante-six mots sont tombés.",
+    "stt": "1046 mots sont tombés.",
+    "dur_s": 2.334
+   },
+   {
+    "texte": "Dix-sept sont restés.",
+    "stt": "17 sont restés.",
+    "dur_s": 1.579
+   },
+   {
+    "texte": "Les voici, du plus fragile au plus tenace.",
+    "stt": "Les voici, du plus fragile au plus tenace.",
+    "dur_s": 3.634
+   }
+  ],
+  "mots": {
+   "change": {
+    "texte": "change, change.",
+    "stt": "Change, change.",
+    "dur_s": 1.614
+   },
+   "survit": {
+    "texte": "survit.",
+    "stt": "survie",
+    "dur_s": 0.708
+   },
+   "question": {
+    "texte": "question, question.",
+    "stt": "Estion, question.",
+    "dur_s": 1.892
+   },
+   "revient": {
+    "texte": "revient.",
+    "stt": "Reviens.",
+    "dur_s": 0.639
+   },
+   "vide": {
+    "texte": "vide.",
+    "stt": "vide,",
+    "dur_s": 0.627
+   },
+   "leçon": {
+    "texte": "leçon.",
+    "stt": "Leçon",
+    "dur_s": 0.592
+   },
+   "exprès": {
+    "texte": "exprès.",
+    "stt": "exprès",
+    "dur_s": 0.755
+   },
+   "tient": {
+    "texte": "tient.",
+    "stt": "Tiens.",
+    "dur_s": 0.476
+   },
+   "bruit": {
+    "texte": "bruit.",
+    "stt": "Bruit.",
+    "dur_s": 0.592
+   },
+   "note": {
+    "texte": "note.",
+    "stt": "Note.",
+    "dur_s": 0.65
+   },
+   "candor": {
+    "texte": "candor, candor.",
+    "stt": "Candor, Candor.",
+    "dur_s": 1.138
+   },
+   "mesure": {
+    "texte": "mesure.",
+    "stt": "Une mesure.",
+    "dur_s": 0.766
+   },
+   "silence": {
+    "texte": "silence.",
+    "stt": "Silence.",
+    "dur_s": 0.94
+   },
+   "seul": {
+    "texte": "seul.",
+    "stt": "Seul.",
+    "dur_s": 0.453
+   },
+   "voix": {
+    "texte": "voix.",
+    "stt": "Voir.",
+    "dur_s": 0.418
+   },
+   "refrain": {
+    "texte": "refrain.",
+    "stt": "Refrain.",
+    "dur_s": 0.604
+   },
+   "reste": {
+    "texte": "reste, reste.",
+    "stt": "Est, reste.",
+    "dur_s": 1.347
+   }
+  },
+  "gist": [
+   {
+    "texte": "Le reste tient.",
+    "stt": "Le reste tient.",
+    "dur_s": 1.091
+   },
+   {
+    "texte": "La voix, seule, mesure le silence.",
+    "stt": "La voix, seule, mesure le silence.",
+    "dur_s": 3.262
+   },
+   {
+    "texte": "Le bruit revient, refrain ou note,",
+    "stt": "Le bruit revient, refrain ou note.",
+    "dur_s": 3.576
+   },
+   {
+    "texte": "la question survit, la leçon aussi.",
+    "stt": "La question survit, la leçon aussi.",
+    "dur_s": 2.299
+   },
+   {
+    "texte": "Ce qui change ne se perd pas.",
+    "stt": "Ce qui change ne se perd pas.",
+    "dur_s": 2.322
+   },
+   {
+    "texte": "Ça revient, transformé, et ça tient.",
+    "stt": "Ça revient transformé et ça tient.",
+    "dur_s": 3.158
+   }
+  ],
+  "outro": [
+   {
+    "texte": "Le sommeil n'efface pas.",
+    "stt": "Le sommeil n'efface pas.",
+    "dur_s": 1.695
+   },
+   {
+    "texte": "Le sommeil... il élague.",
+    "stt": "Le sommeil, il élague.",
+    "dur_s": 1.335
+   },
+   {
+    "texte": "Ce qui reste, tient.",
+    "stt": "Ce qui reste tient.",
+    "dur_s": 2.078
+   }
+  ]
+ }
+}

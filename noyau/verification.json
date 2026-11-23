@@ -1,0 +1,308 @@
+{
+ "duree_flac_s": 109.591,
+ "duree_mp3_s": 109.591,
+ "flac_vs_wav_err": 1.1920928955078125e-07,
+ "flac_lossless": true,
+ "zeros_flac_tete": 0.0,
+ "zeros_flac_queue": 0.0,
+ "zeros_mp3_tete_apres_pad": 5.246838554739952e-07,
+ "mp3_queue_max": 1.39651820063591e-05,
+ "zeros_ok": true,
+ "cloches": [
+  {
+   "w": "change",
+   "n": 5,
+   "attendu_Hz": 220.0,
+   "mesure_Hz": 220.0,
+   "cents": 0.0
+  },
+  {
+   "w": "survit",
+   "n": 5,
+   "attendu_Hz": 220.0,
+   "mesure_Hz": 220.0,
+   "cents": -0.0
+  },
+  {
+   "w": "question",
+   "n": 5,
+   "attendu_Hz": 220.0,
+   "mesure_Hz": 220.0,
+   "cents": 0.0
+  },
+  {
+   "w": "revient",
+   "n": 5,
+   "attendu_Hz": 220.0,
+   "mesure_Hz": 220.0,
+   "cents": -0.0
+  },
+  {
+   "w": "vide",
+   "n": 5,
+   "attendu_Hz": 220.0,
+   "mesure_Hz": 220.0,
+   "cents": -0.0
+  },
+  {
+   "w": "leçon",
+   "n": 6,
+   "attendu_Hz": 261.626,
+   "mesure_Hz": 261.62,
+   "cents": -0.0
+  },
+  {
+   "w": "exprès",
+   "n": 6,
+   "attendu_Hz": 261.626,
+   "mesure_Hz": 261.63,
+   "cents": 0.0
+  },
+  {
+   "w": "tient",
+   "n": 6,
+   "attendu_Hz": 261.626,
+   "mesure_Hz": 261.63,
+   "cents": -0.0
+  },
+  {
+   "w": "bruit",
+   "n": 6,
+   "attendu_Hz": 261.626,
+   "mesure_Hz": 261.63,
+   "cents": 0.0
+  },
+  {
+   "w": "note",
+   "n": 6,
+   "attendu_Hz": 261.626,
+   "mesure_Hz": 261.63,
+   "cents": 0.0
+  },
+  {
+   "w": "candor",
+   "n": 7,
+   "attendu_Hz": 293.665,
+   "mesure_Hz": 293.67,
+   "cents": 0.0
+  },
+  {
+   "w": "mesure",
+   "n": 7,
+   "attendu_Hz": 293.665,
+   "mesure_Hz": 293.66,
+   "cents": -0.0
+  },
+  {
+   "w": "silence",
+   "n": 7,
+   "attendu_Hz": 293.665,
+   "mesure_Hz": 293.66,
+   "cents": -0.0
+  },
+  {
+   "w": "seul",
+   "n": 8,
+   "attendu_Hz": 329.628,
+   "mesure_Hz": 329.63,
+   "cents": -0.0
+  },
+  {
+   "w": "voix",
+   "n": 8,
+   "attendu_Hz": 329.628,
+   "mesure_Hz": 329.63,
+   "cents": 0.0
+  },
+  {
+   "w": "refrain",
+   "n": 9,
+   "attendu_Hz": 391.995,
+   "mesure_Hz": 391.99,
+   "cents": -0.0
+  },
+  {
+   "w": "reste",
+   "n": 10,
+   "attendu_Hz": 440.0,
+   "mesure_Hz": 440.0,
+   "cents": 0.0
+  }
+ ],
+ "cloches_ok": true,
+ "corr_mots": {
+  "change": 0.9994,
+  "survit": 0.985,
+  "question": 0.9925,
+  "revient": 0.9893,
+  "vide": 0.9892,
+  "leçon": 0.9879,
+  "exprès": 0.9795,
+  "tient": 0.9752,
+  "bruit": 0.9845,
+  "note": 0.9873,
+  "candor": 0.9916,
+  "mesure": 0.9901,
+  "silence": 0.9834,
+  "seul": 0.985,
+  "voix": 0.9743,
+  "refrain": 0.9713,
+  "reste": 0.9816
+ },
+ "corr_mots_min": 0.9713,
+ "stt_mots_mix": {
+  "change": {
+   "heard": "Change, change.",
+   "ok": true
+  },
+  "survit": {
+   "heard": "survie",
+   "ok": true
+  },
+  "question": {
+   "heard": "Estion, question.",
+   "ok": true
+  },
+  "revient": {
+   "heard": "Reviens.",
+   "ok": true
+  },
+  "vide": {
+   "heard": "Vides.",
+   "ok": true
+  },
+  "leçon": {
+   "heard": "Leçon",
+   "ok": true
+  },
+  "exprès": {
+   "heard": "exprès",
+   "ok": true
+  },
+  "tient": {
+   "heard": "Ciao !",
+   "ok": false
+  },
+  "bruit": {
+   "heard": "bruit,",
+   "ok": true
+  },
+  "note": {
+   "heard": "Note.",
+   "ok": true
+  },
+  "candor": {
+   "heard": "Candor, Candor.",
+   "ok": true
+  },
+  "mesure": {
+   "heard": "Mesures.",
+   "ok": true
+  },
+  "silence": {
+   "heard": "Silence.",
+   "ok": true
+  },
+  "seul": {
+   "heard": "seul.",
+   "ok": true
+  },
+  "voix": {
+   "heard": "Voilà.",
+   "ok": true
+  },
+  "refrain": {
+   "heard": "Ruffin.",
+   "ok": false
+  },
+  "reste": {
+   "heard": "Est, reste.",
+   "ok": true
+  }
+ },
+ "stt_mots_ok_count": 15,
+ "stt_phrases_mix": [
+  {
+   "seg": "intro0",
+   "texte": "Le vent est passé sur quinze nuits.",
+   "heard": "Le vent est passé sur quinze nuits.",
+   "ok": true
+  },
+  {
+   "seg": "intro1",
+   "texte": "Mille quarante-six mots sont tombés.",
+   "heard": "1046 mots sont tombés.",
+   "ok": true
+  },
+  {
+   "seg": "intro2",
+   "texte": "Dix-sept sont restés.",
+   "heard": "17 sont restés.",
+   "ok": true
+  },
+  {
+   "seg": "intro3",
+   "texte": "Les voici, du plus fragile au plus tenace.",
+   "heard": "Les voici, du plus fragile au plus tenace.",
+   "ok": true
+  },
+  {
+   "seg": "gist0",
+   "texte": "Le reste tient.",
+   "heard": "Le reste tient.",
+   "ok": true
+  },
+  {
+   "seg": "gist1",
+   "texte": "La voix, seule, mesure le silence.",
+   "heard": "La voix, seule, mesure le silence.",
+   "ok": true
+  },
+  {
+   "seg": "gist2",
+   "texte": "Le bruit revient, refrain ou note,",
+   "heard": "Le bruit revient ? Refrain ou note ?",
+   "ok": true
+  },
+  {
+   "seg": "gist3",
+   "texte": "la question survit, la leçon aussi.",
+   "heard": "La question survit, la leçon aussi.",
+   "ok": true
+  },
+  {
+   "seg": "gist4",
+   "texte": "Ce qui change ne se perd pas.",
+   "heard": "Ce qui change ne se perd pas.",
+   "ok": true
+  },
+  {
+   "seg": "gist5",
+   "texte": "Ça revient, transformé, et ça tient.",
+   "heard": "Ça revient transformé et ça tient.",
+   "ok": true
+  },
+  {
+   "seg": "outro0",
+   "texte": "Le sommeil n'efface pas.",
+   "heard": "Le sommeil n'efface pas.",
+   "ok": true
+  },
+  {
+   "seg": "outro1",
+   "texte": "Le sommeil... il élague.",
+   "heard": "Le sommeil, il élague.",
+   "ok": true
+  },
+  {
+   "seg": "outro2",
+   "texte": "Ce qui reste, tient.",
+   "heard": "Ce qui reste, tient.",
+   "ok": true
+  }
+ ],
+ "stt_phrases_ok": true,
+ "lufs": -18.65,
+ "true_peak": -1.27,
+ "VERDICT": "OK"
+}
