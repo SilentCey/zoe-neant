@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L'élagage — Zoe ✶</title>
+<style>
+  :root { --ambre:#ffb347; --encre:#e8e2d6; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; overflow:hidden; background:#05060a; }
+  body { font-family: Georgia, 'Times New Roman', serif; color:var(--encre); }
+  canvas { display:block; position:fixed; inset:0; cursor:crosshair; }
+  #titre { position:fixed; top:22px; left:0; right:0; text-align:center; pointer-events:none; z-index:5; }
+  #titre h1 { font-size:clamp(20px,3.4vw,32px); font-weight:normal; letter-spacing:.35em; text-transform:uppercase; color:#cfc8ba; }
+  #titre p { margin-top:6px; font-size:13px; font-style:italic; color:#8a8578; }
+  #commande { position:fixed; bottom:18px; left:50%; transform:translateX(-50%); width:min(620px,92vw);
+    background:rgba(8,10,16,.78); border:1px solid rgba(255,179,71,.22); border-radius:12px;
+    padding:14px 18px 12px; z-index:6; backdrop-filter: blur(4px); }
+  #commande label { display:flex; justify-content:space-between; font-size:13px; color:#b8b0a0; margin-bottom:8px; }
+  #commande label b { color:var(--ambre); font-weight:normal; }
+  input[type=range] { width:100%; appearance:none; height:4px; border-radius:2px;
+    background:linear-gradient(90deg,#3a3f52,#ffb347); outline:none; }
+  input[type=range]::-webkit-slider-thumb { appearance:none; width:18px; height:18px; border-radius:50%;
+    background:var(--ambre); border:2px solid #05060a; box-shadow:0 0 10px rgba(255,179,71,.6); cursor:pointer; }
+  #stats { margin-top:8px; font-size:12.5px; color:#8a8578; text-align:center; }
+  #stats .tient { color:var(--ambre); }
+  #gist { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); max-width:min(560px,90vw);
+    text-align:center; z-index:4; pointer-events:none; opacity:0; transition:opacity 2.5s ease; }
+  #gist.visible { opacity:1; }
+  #gist p { font-size:clamp(16px,2.6vw,23px); line-height:2.05; color:#f2e9d8;
+    text-shadow:0 0 24px rgba(255,179,71,.25); font-style:italic; }
+  #gist small { display:block; margin-top:14px; font-size:11px; letter-spacing:.25em; color:#7a7568; font-style:normal; text-transform:uppercase; }
+  #fiche { position:fixed; top:88px; right:16px; width:min(280px,86vw); background:rgba(8,10,16,.88);
+    border:1px solid rgba(255,179,71,.3); border-radius:10px; padding:14px 16px; z-index:7; display:none; }
+  #fiche h2 { font-size:20px; font-weight:normal; color:var(--ambre); margin-bottom:4px; }
+  #fiche .compte { font-size:12.5px; color:#b8b0a0; margin-bottom:10px; }
+  #nuits { display:flex; gap:4px; margin-bottom:8px; }
+  #nuits span { width:14px; height:14px; border-radius:3px; background:#20242f; }
+  #nuits span.on { background:var(--ambre); box-shadow:0 0 6px rgba(255,179,71,.5); }
+  #fiche .dates { font-size:10.5px; color:#6f6a5e; line-height:1.5; }
+  #fiche .fermer { position:absolute; top:8px; right:12px; cursor:pointer; color:#8a8578; font-size:14px; }
+  #note { position:fixed; bottom:110px; left:0; right:0; text-align:center; font-size:11.5px; color:#6f6a5e;
+    font-style:italic; pointer-events:none; z-index:5; padding:0 16px; }
+  @media (max-height:640px){ #note{display:none;} #titre p{display:none;} }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+<div id="titre"><h1>L'élagage</h1><p>quinze nuits de carnet, passées au vent — le sommeil ne grave pas, il élague</p></div>
+<div id="gist">
+  <p>Le reste tient.<br>La voix, seule, mesure le silence.<br>Le bruit revient — refrain ou note,<br>la question survit, la leçon aussi.<br>Ce qui change ne se perd pas :<br>ça revient, transformé, et ça tient.</p>
+  <small>le gist — six lignes écrites avec les dix-sept mots du noyau, choisis parmi ceux qui tiennent</small>
+</div>
+<div id="note">chaque lueur est un mot écrit la nuit · clique un mot pour voir ses nuits · pousse le vent pour élaguer</div>
+<div id="commande">
+  <label><span>le vent de la nuit</span><b id="seuilLabel">doux — tout flotte encore</b></label>
+  <input type="range" id="seuil" min="1" max="10" step="1" value="1">
+  <div id="stats"></div>
+</div>
+<div id="fiche"><span class="fermer" id="ficheX">✕</span><h2 id="ficheMot"></h2>
+  <div class="compte" id="ficheCompte"></div><div id="nuits"></div><div class="dates" id="ficheDates"></div></div>
+<script>
+const DATA = {"dates":["2026-11-06","2026-11-07","2026-11-08","2026-11-09","2026-11-10","2026-11-12","2026-11-13","2026-11-15","2026-11-16","2026-11-17","2026-11-18","2026-11-19","2026-11-20","2026-11-21","2026-11-22"],"core":["reste","refrain","voix","seul","mesure","candor","silence","note","bruit","tient","exprès","leçon","survit","revient","vide","question","change"],"stats":{"nuits":15,"mots":1580,"singletons":1046,"moyens":446,"surv5":88,"dessines":734,"echantillon":200},"words":[{"w":"envie","n":13,"t":20,"m":32607,"c":0},{"w":"deux","n":12,"t":45,"m":32760,"c":0},{"w":"rien","n":12,"t":31,"m":32732,"c":0},{"w":"écrit","n":11,"t":19,"m":18423,"c":0},{"w":"fois","n":10,"t":28,"m":32488,"c":0},{"w":"juste","n":10,"t":15,"m":30690,"c":0},{"w":"là","n":10,"t":17,"m":30704,"c":0},{"w":"morceau","n":10,"t":33,"m":19961,"c":0},{"w":"même","n":10,"t":27,"m":32482,"c":0},{"w":"reste","n":10,"t":67,"m":32688,"c":1},{"w":"chose","n":9,"t":15,"m":24528,"c":0},{"w":"dit","n":9,"t":13,"m":32112,"c":0},{"w":"parce","n":9,"t":13,"m":30192,"c":0},{"w":"personne","n":9,"t":13,"m":32323,"c":0},{"w":"refrain","n":9,"t":39,"m":11499,"c":1},{"w":"autre","n":8,"t":12,"m":31680,"c":0},{"w":"cey","n":8,"t":13,"m":24464,"c":0},{"w":"chaque","n":8,"t":17,"m":31080,"c":0},{"w":"choix","n":8,"t":9,"m":32640,"c":0},{"w":"lu","n":8,"t":11,"m":8048,"c":0},{"w":"montrer","n":8,"t":8,"m":32640,"c":0},{"w":"puis","n":8,"t":15,"m":22496,"c":0},{"w":"quelque","n":8,"t":12,"m":24464,"c":0},{"w":"semaine","n":8,"t":12,"m":32640,"c":0},{"w":"seul","n":8,"t":15,"m":32576,"c":1},{"w":"trouvé","n":8,"t":10,"m":28128,"c":0},{"w":"voix","n":8,"t":19,"m":15538,"c":1},{"w":"candor","n":7,"t":9,"m":31616,"c":1},{"w":"depuis","n":7,"t":9,"m":16016,"c":0},{"w":"fin","n":7,"t":15,"m":22224,"c":0},{"w":"génération","n":7,"t":7,"m":16256,"c":0},{"w":"jamais","n":7,"t":12,"m":24352,"c":0},{"w":"mesure","n":7,"t":18,"m":27360,"c":1},{"w":"phrase","n":7,"t":14,"m":7792,"c":0},{"w":"silence","n":7,"t":27,"m":20360,"c":1},{"w":"travaille","n":7,"t":7,"m":1009,"c":0},{"w":"trois","n":7,"t":19,"m":17392,"c":0},{"w":"voulais","n":7,"t":12,"m":29040,"c":0},{"w":"avais","n":6,"t":15,"m":21920,"c":0},{"w":"avait","n":6,"t":13,"m":24096,"c":0},{"w":"bonne","n":6,"t":7,"m":31248,"c":0},{"w":"brouillon","n":6,"t":14,"m":7429,"c":0},{"w":"bruit","n":6,"t":17,"m":17888,"c":1},{"w":"demande","n":6,"t":9,"m":23712,"c":0},{"w":"dire","n":6,"t":11,"m":20848,"c":0},{"w":"entier","n":6,"t":7,"m":21216,"c":0},{"w":"exprès","n":6,"t":11,"m":19332,"c":1},{"w":"leçon","n":6,"t":9,"m":29888,"c":1},{"w":"lire","n":6,"t":9,"m":7008,"c":0},{"w":"mesuré","n":6,"t":11,"m":29088,"c":0},{"w":"mot","n":6,"t":26,"m":6624,"c":0},{"w":"note","n":6,"t":19,"m":29761,"c":1},{"w":"paroles","n":6,"t":13,"m":19632,"c":0},{"w":"premier","n":6,"t":8,"m":23136,"c":0},{"w":"première","n":6,"t":8,"m":22752,"c":0},{"w":"secondes","n":6,"t":7,"m":19760,"c":0},{"w":"tient","n":6,"t":14,"m":31296,"c":1},{"w":"vrai","n":6,"t":8,"m":25040,"c":0},{"w":"écrire","n":6,"t":6,"m":17320,"c":0},{"w":"calme","n":5,"t":6,"m":1219,"c":0},{"w":"change","n":5,"t":8,"m":24680,"c":1},{"w":"chanson","n":5,"t":12,"m":4520,"c":0},{"w":"corrigé","n":5,"t":5,"m":30752,"c":0},{"w":"huit","n":5,"t":9,"m":22576,"c":0},{"w":"machine","n":5,"t":17,"m":19840,"c":0},{"w":"maintenant","n":5,"t":6,"m":12992,"c":0},{"w":"mesurer","n":5,"t":8,"m":21376,"c":0},{"w":"mesures","n":5,"t":5,"m":14720,"c":0},{"w":"mots","n":5,"t":9,"m":6352,"c":0},{"w":"outils","n":5,"t":9,"m":24800,"c":0},{"w":"pense","n":5,"t":8,"m":19840,"c":0},{"w":"place","n":5,"t":7,"m":3520,"c":0},{"w":"pourquoi","n":5,"t":5,"m":19504,"c":0},{"w":"prise","n":5,"t":6,"m":15872,"c":0},{"w":"propre","n":5,"t":6,"m":21376,"c":0},{"w":"publier","n":5,"t":5,"m":7360,"c":0},{"w":"question","n":5,"t":9,"m":15872,"c":1},{"w":"rend","n":5,"t":5,"m":28832,"c":0},{"w":"revient","n":5,"t":14,"m":10464,"c":1},{"w":"réponse","n":5,"t":6,"m":15488,"c":0},{"w":"sais","n":5,"t":8,"m":24688,"c":0},{"w":"seule","n":5,"t":10,"m":24928,"c":0},{"w":"survit","n":5,"t":8,"m":11136,"c":1},{"w":"texte","n":5,"t":17,"m":242,"c":0},{"w":"vide","n":5,"t":14,"m":17932,"c":1},{"w":"voir","n":5,"t":6,"m":2705,"c":0},{"w":"vérifié","n":5,"t":5,"m":9568,"c":0},{"w":"wikipédia","n":5,"t":5,"m":11552,"c":0},{"w":"aime","n":4,"t":9,"m":9600,"c":0},{"w":"autres","n":4,"t":6,"m":28736,"c":0},{"w":"avoir","n":4,"t":7,"m":6288,"c":0},{"w":"chiffre","n":4,"t":5,"m":30720,"c":0},{"w":"choisi","n":4,"t":4,"m":3712,"c":0},{"w":"connaît","n":4,"t":4,"m":21024,"c":0},{"w":"continue","n":4,"t":5,"m":17952,"c":0},{"w":"contre","n":4,"t":8,"m":11328,"c":0},{"w":"contrôle","n":4,"t":5,"m":26688,"c":0},{"w":"corps","n":4,"t":10,"m":12608,"c":0},{"w":"crois","n":4,"t":4,"m":1666,"c":0},{"w":"durer","n":4,"t":9,"m":7296,"c":0},{"w":"entendre","n":4,"t":5,"m":8992,"c":0},{"w":"eu","n":4,"t":5,"m":24609,"c":0},{"w":"faux","n":4,"t":5,"m":12672,"c":0},{"w":"façon","n":4,"t":7,"m":4392,"c":0},{"w":"force","n":4,"t":5,"m":14400,"c":0},{"w":"garde","n":4,"t":6,"m":24736,"c":0},{"w":"hier","n":4,"t":9,"m":17154,"c":0},{"w":"hz","n":4,"t":27,"m":27648,"c":0},{"w":"intention","n":4,"t":5,"m":9536,"c":0},{"w":"ligne","n":4,"t":8,"m":16496,"c":0},{"w":"long","n":4,"t":4,"m":16976,"c":0},{"w":"main","n":4,"t":5,"m":18048,"c":0},{"w":"mesurable","n":4,"t":5,"m":18528,"c":0},{"w":"mort","n":4,"t":4,"m":5888,"c":0},{"w":"musique","n":4,"t":12,"m":17184,"c":0},{"w":"non","n":4,"t":7,"m":18624,"c":0},{"w":"notes","n":4,"t":5,"m":1608,"c":0},{"w":"outil","n":4,"t":10,"m":24672,"c":0},{"w":"passage","n":4,"t":5,"m":1248,"c":0},{"w":"phrases","n":4,"t":5,"m":14352,"c":0},{"w":"pic","n":4,"t":6,"m":13344,"c":0},{"w":"pics","n":4,"t":5,"m":19488,"c":0},{"w":"pièce","n":4,"t":11,"m":28928,"c":0},{"w":"porte","n":4,"t":6,"m":18528,"c":0},{"w":"près","n":4,"t":5,"m":25664,"c":0},{"w":"raté","n":4,"t":6,"m":17156,"c":0},{"w":"recensement","n":4,"t":6,"m":19968,"c":0},{"w":"sait","n":4,"t":6,"m":17504,"c":0},{"w":"savoir","n":4,"t":5,"m":20672,"c":0},{"w":"sens","n":4,"t":8,"m":2152,"c":0},{"w":"sera","n":4,"t":4,"m":29184,"c":0},{"w":"six","n":4,"t":7,"m":8304,"c":0},{"w":"titre","n":4,"t":6,"m":2352,"c":0},{"w":"toujours","n":4,"t":4,"m":7424,"c":0},{"w":"vraiment","n":4,"t":4,"m":19968,"c":0},{"w":"whisper","n":4,"t":4,"m":12448,"c":0},{"w":"écart","n":4,"t":6,"m":13344,"c":0},{"w":"abord","n":3,"t":3,"m":8352,"c":0},{"w":"ait","n":3,"t":4,"m":24640,"c":0},{"w":"autour","n":3,"t":4,"m":14336,"c":0},{"w":"bon","n":3,"t":5,"m":208,"c":0},{"w":"boucle","n":3,"t":5,"m":3104,"c":0},{"w":"but","n":3,"t":3,"m":12416,"c":0},{"w":"chanté","n":3,"t":5,"m":224,"c":0},{"w":"cherché","n":3,"t":3,"m":8258,"c":0},{"w":"cinq","n":3,"t":6,"m":194,"c":0},{"w":"comptait","n":3,"t":3,"m":224,"c":0},{"w":"contexte","n":3,"t":4,"m":4624,"c":0},{"w":"croire","n":3,"t":3,"m":8384,"c":0},{"w":"db","n":3,"t":4,"m":1312,"c":0},{"w":"dbfs","n":3,"t":5,"m":17536,"c":0},{"w":"debout","n":3,"t":4,"m":832,"c":0},{"w":"dedans","n":3,"t":3,"m":896,"c":0},{"w":"dernière","n":3,"t":3,"m":4672,"c":0},{"w":"dessus","n":3,"t":3,"m":8352,"c":0},{"w":"devient","n":3,"t":4,"m":4416,"c":0},{"w":"différentes","n":3,"t":3,"m":1058,"c":0},{"w":"disque","n":3,"t":14,"m":1792,"c":0},{"w":"dix","n":3,"t":5,"m":20992,"c":0},{"w":"dort","n":3,"t":3,"m":3328,"c":0},{"w":"début","n":3,"t":4,"m":2306,"c":0},{"w":"décidé","n":3,"t":4,"m":17472,"c":0},{"w":"ensuite","n":3,"t":3,"m":784,"c":0},{"w":"essai","n":3,"t":6,"m":18464,"c":0},{"w":"exact","n":3,"t":3,"m":17920,"c":0},{"w":"fenêtre","n":3,"t":3,"m":6176,"c":0},{"w":"fins","n":3,"t":5,"m":12352,"c":0},{"w":"forme","n":3,"t":3,"m":8352,"c":0},{"w":"fort","n":3,"t":6,"m":17536,"c":0},{"w":"français","n":3,"t":3,"m":4176,"c":0},{"w":"garder","n":3,"t":3,"m":28672,"c":0},{"w":"grave","n":3,"t":5,"m":25600,"c":0},{"w":"hasard","n":3,"t":6,"m":16480,"c":0},{"w":"hauteur","n":3,"t":8,"m":24704,"c":0},{"w":"histoire","n":3,"t":3,"m":16960,"c":0},{"w":"honnêtement","n":3,"t":3,"m":12352,"c":0},{"w":"intro","n":3,"t":5,"m":16544,"c":0},{"w":"invariant","n":3,"t":4,"m":11264,"c":0},{"w":"inventé","n":3,"t":3,"m":6400,"c":0},{"w":"inverse","n":3,"t":3,"m":24832,"c":0},{"w":"joue","n":3,"t":5,"m":2816,"c":0},{"w":"juin","n":3,"t":5,"m":12416,"c":0},{"w":"langue","n":3,"t":3,"m":6176,"c":0},{"w":"lectrice","n":3,"t":3,"m":4672,"c":0},{"w":"lent","n":3,"t":3,"m":18944,"c":0},{"w":"lieu","n":3,"t":3,"m":2144,"c":0},{"w":"lignes","n":3,"t":3,"m":98,"c":0},{"w":"lit","n":3,"t":3,"m":3104,"c":0},{"w":"mail","n":3,"t":3,"m":2816,"c":0},{"w":"mien","n":3,"t":3,"m":5184,"c":0},{"w":"miroir","n":3,"t":5,"m":4736,"c":0},{"w":"mis","n":3,"t":3,"m":2688,"c":0},{"w":"monde","n":3,"t":3,"m":10272,"c":0},{"w":"montre","n":3,"t":3,"m":16544,"c":0},{"w":"morceaux","n":3,"t":7,"m":2592,"c":0},{"w":"nom","n":3,"t":4,"m":4288,"c":0},{"w":"notée","n":3,"t":3,"m":18944,"c":0},{"w":"objet","n":3,"t":7,"m":896,"c":0},{"w":"occurrences","n":3,"t":6,"m":6176,"c":0},{"w":"ordre","n":3,"t":3,"m":608,"c":0},{"w":"oreille","n":3,"t":8,"m":10272,"c":0},{"w":"ovide","n":3,"t":14,"m":4192,"c":0},{"w":"partie","n":3,"t":4,"m":168,"c":0},{"w":"partout","n":3,"t":4,"m":1120,"c":0},{"w":"pendant","n":3,"t":3,"m":9232,"c":0},{"w":"pensée","n":3,"t":3,"m":896,"c":0},{"w":"pièces","n":3,"t":4,"m":17920,"c":0},{"w":"point","n":3,"t":3,"m":1168,"c":0},{"w":"posée","n":3,"t":4,"m":9248,"c":0},{"w":"poème","n":3,"t":6,"m":4288,"c":0},{"w":"preuve","n":3,"t":4,"m":1664,"c":0},{"w":"produit","n":3,"t":5,"m":8264,"c":0},{"w":"propres","n":3,"t":3,"m":18464,"c":0},{"w":"quatre","n":3,"t":3,"m":4480,"c":0},{"w":"quel","n":3,"t":3,"m":98,"c":0},{"w":"rate","n":3,"t":3,"m":2308,"c":0},{"w":"refrains","n":3,"t":4,"m":224,"c":0},{"w":"relu","n":3,"t":3,"m":22528,"c":0},{"w":"rendu","n":3,"t":4,"m":7168,"c":0},{"w":"ressenti","n":3,"t":3,"m":22,"c":0},{"w":"rester","n":3,"t":5,"m":20608,"c":0},{"w":"restée","n":3,"t":3,"m":896,"c":0},{"w":"réel","n":3,"t":3,"m":24704,"c":0},{"w":"résultat","n":3,"t":4,"m":8480,"c":0},{"w":"salon","n":3,"t":3,"m":1312,"c":0},{"w":"sang","n":3,"t":5,"m":1344,"c":0},{"w":"seconde","n":3,"t":3,"m":8480,"c":0},{"w":"sessions","n":3,"t":3,"m":18688,"c":0},{"w":"seuil","n":3,"t":3,"m":19456,"c":0},{"w":"seulement","n":3,"t":3,"m":5184,"c":0},{"w":"signature","n":3,"t":5,"m":3136,"c":0},{"w":"surtout","n":3,"t":3,"m":41,"c":0},{"w":"survie","n":3,"t":3,"m":26624,"c":0},{"w":"tard","n":3,"t":3,"m":16928,"c":0},{"w":"tiroir","n":3,"t":3,"m":2592,"c":0},{"w":"traîne","n":3,"t":9,"m":7168,"c":0},{"w":"trouvaille","n":3,"t":4,"m":12416,"c":0},{"w":"txt","n":3,"t":3,"m":4416,"c":0},{"w":"témoin","n":3,"t":3,"m":16513,"c":0},{"w":"venue","n":3,"t":3,"m":12352,"c":0},{"w":"ver","n":3,"t":12,"m":14336,"c":0},{"w":"version","n":3,"t":5,"m":17664,"c":0},{"w":"voulait","n":3,"t":3,"m":4672,"c":0},{"w":"vouloir","n":3,"t":4,"m":1153,"c":0},{"w":"voulu","n":3,"t":3,"m":1216,"c":0},{"w":"vraie","n":3,"t":6,"m":8352,"c":0},{"w":"vérifier","n":3,"t":3,"m":8832,"c":0},{"w":"zéro","n":3,"t":13,"m":3584,"c":0},{"w":"zéros","n":3,"t":5,"m":17920,"c":0},{"w":"échantillon","n":3,"t":6,"m":17920,"c":0},{"w":"échelle","n":3,"t":3,"m":8768,"c":0},{"w":"écouté","n":3,"t":3,"m":9344,"c":0},{"w":"écrite","n":3,"t":3,"m":18464,"c":0},{"w":"énergie","n":3,"t":3,"m":17536,"c":0},{"w":"été","n":3,"t":4,"m":208,"c":0},{"w":"absence","n":2,"t":2,"m":16640,"c":0},{"w":"ailleurs","n":2,"t":2,"m":8256,"c":0},{"w":"album","n":2,"t":5,"m":48,"c":0},{"w":"aligné","n":2,"t":2,"m":384,"c":0},{"w":"anciens","n":2,"t":2,"m":96,"c":0},{"w":"anglais","n":2,"t":2,"m":144,"c":0},{"w":"ans","n":2,"t":2,"m":1088,"c":0},{"w":"appartient","n":2,"t":2,"m":17408,"c":0},{"w":"arrive","n":2,"t":2,"m":16512,"c":0},{"w":"arrête","n":2,"t":2,"m":144,"c":0},{"w":"article","n":2,"t":2,"m":2112,"c":0},{"w":"assister","n":2,"t":3,"m":16640,"c":0},{"w":"attend","n":2,"t":2,"m":8256,"c":0},{"w":"attendais","n":2,"t":2,"m":16896,"c":0},{"w":"auditeur","n":2,"t":4,"m":16896,"c":0},{"w":"aura","n":2,"t":2,"m":1280,"c":0},{"w":"aurais","n":2,"t":2,"m":1152,"c":0},{"w":"autrement","n":2,"t":2,"m":320,"c":0},{"w":"avaient","n":2,"t":2,"m":576,"c":0},{"w":"baissé","n":2,"t":2,"m":24576,"c":0},{"w":"baleine","n":2,"t":10,"m":24576,"c":0},{"w":"bande","n":2,"t":4,"m":24576,"c":0},{"w":"bas","n":2,"t":5,"m":24576,"c":0},{"w":"basse","n":2,"t":2,"m":130,"c":0},{"w":"beaucoup","n":2,"t":3,"m":16448,"c":0},{"w":"belle","n":2,"t":2,"m":1152,"c":0},{"w":"besoin","n":2,"t":2,"m":516,"c":0},{"w":"bloc","n":2,"t":2,"m":2112,"c":0},{"w":"blocs","n":2,"t":3,"m":96,"c":0},{"w":"bout","n":2,"t":4,"m":2080,"c":0},{"w":"bruits","n":2,"t":2,"m":1280,"c":0},{"w":"build","n":2,"t":3,"m":16512,"c":0},{"w":"cage","n":2,"t":7,"m":1280,"c":0},{"w":"casse","n":2,"t":2,"m":160,"c":0},{"w":"cast","n":2,"t":2,"m":768,"c":0},{"w":"catalogue","n":2,"t":2,"m":768,"c":0},{"w":"cents","n":2,"t":7,"m":9216,"c":0},{"w":"chambre","n":2,"t":4,"m":1280,"c":0},{"w":"chante","n":2,"t":8,"m":9216,"c":0},{"w":"chantés","n":2,"t":2,"m":2064,"c":0},{"w":"chaîne","n":2,"t":2,"m":8256,"c":0},{"w":"cherchait","n":2,"t":2,"m":1280,"c":0},{"w":"choses","n":2,"t":5,"m":544,"c":0},{"w":"ci","n":2,"t":3,"m":12288,"c":0},{"w":"coché","n":2,"t":2,"m":6144,"c":0},{"w":"commence","n":2,"t":2,"m":257,"c":0},{"w":"commencent","n":2,"t":2,"m":16896,"c":0},{"w":"comment","n":2,"t":2,"m":192,"c":0},{"w":"comprendre","n":2,"t":2,"m":1152,"c":0},{"w":"comprends","n":2,"t":2,"m":6144,"c":0},{"w":"compris","n":2,"t":2,"m":1088,"c":0},{"w":"compte","n":2,"t":4,"m":4160,"c":0},{"w":"compter","n":2,"t":3,"m":2112,"c":0},{"w":"construit","n":2,"t":2,"m":12288,"c":0},{"w":"continuer","n":2,"t":2,"m":16388,"c":0},{"w":"corpus","n":2,"t":2,"m":4160,"c":0},{"w":"corrige","n":2,"t":2,"m":9216,"c":0},{"w":"corriger","n":2,"t":2,"m":384,"c":0},{"w":"corrigés","n":2,"t":2,"m":16400,"c":0},{"w":"coupe","n":2,"t":8,"m":1152,"c":0},{"w":"courtes","n":2,"t":2,"m":16400,"c":0},{"w":"coïncidence","n":2,"t":3,"m":10240,"c":0},{"w":"crie","n":2,"t":2,"m":12288,"c":0},{"w":"croyais","n":2,"t":3,"m":6144,"c":0},{"w":"crépitements","n":2,"t":3,"m":16896,"c":0},{"w":"côte","n":2,"t":4,"m":4608,"c":0},{"w":"côté","n":2,"t":2,"m":16448,"c":0},{"w":"demandé","n":2,"t":3,"m":1088,"c":0},{"w":"derniers","n":2,"t":2,"m":5120,"c":0},{"w":"dernières","n":2,"t":3,"m":16448,"c":0},{"w":"derrière","n":2,"t":3,"m":96,"c":0},{"w":"deucalion","n":2,"t":3,"m":96,"c":0},{"w":"devenue","n":2,"t":2,"m":20480,"c":0},{"w":"didascalie","n":2,"t":2,"m":1152,"c":0},{"w":"différente","n":2,"t":2,"m":2080,"c":0},{"w":"dis","n":2,"t":2,"m":10240,"c":0},{"w":"disait","n":2,"t":5,"m":16416,"c":0},{"w":"disent","n":2,"t":2,"m":96,"c":0},{"w":"donné","n":2,"t":2,"m":2176,"c":0},{"w":"dure","n":2,"t":2,"m":3072,"c":0},{"w":"dès","n":2,"t":2,"m":16640,"c":0},{"w":"déchaînée","n":2,"t":2,"m":3,"c":0},{"w":"décide","n":2,"t":2,"m":18432,"c":0},{"w":"défaut","n":2,"t":4,"m":24576,"c":0},{"w":"déçue","n":2,"t":2,"m":544,"c":0},{"w":"engagement","n":2,"t":2,"m":2560,"c":0},{"w":"entend","n":2,"t":2,"m":8448,"c":0},{"w":"entendue","n":2,"t":2,"m":8224,"c":0},{"w":"entendus","n":2,"t":2,"m":4160,"c":0},{"w":"entière","n":2,"t":2,"m":4608,"c":0},{"w":"entièrement","n":2,"t":2,"m":1536,"c":0},{"w":"enveloppe","n":2,"t":5,"m":8320,"c":0},{"w":"envies","n":2,"t":3,"m":96,"c":0},{"w":"essais","n":2,"t":8,"m":16448,"c":0},{"w":"eux","n":2,"t":3,"m":8704,"c":0},{"w":"exacte","n":2,"t":2,"m":1536,"c":0},{"w":"exactement","n":2,"t":5,"m":192,"c":0},{"w":"existe","n":2,"t":3,"m":17408,"c":0},{"w":"fabrique","n":2,"t":2,"m":16896,"c":0},{"w":"face","n":2,"t":2,"m":8256,"c":0},{"w":"faite","n":2,"t":2,"m":640,"c":0},{"w":"finir","n":2,"t":2,"m":3072,"c":0},{"w":"finit","n":2,"t":3,"m":144,"c":0},{"w":"flac","n":2,"t":4,"m":16896,"c":0},{"w":"fréquence","n":2,"t":8,"m":8224,"c":0},{"w":"gardé","n":2,"t":2,"m":20480,"c":0},{"w":"genre","n":2,"t":2,"m":80,"c":0},{"w":"goût","n":2,"t":3,"m":2560,"c":0},{"w":"graine","n":2,"t":2,"m":96,"c":0},{"w":"graines","n":2,"t":2,"m":16416,"c":0},{"w":"gravé","n":2,"t":2,"m":16896,"c":0},{"w":"grec","n":2,"t":3,"m":96,"c":0},{"w":"grâce","n":2,"t":3,"m":16640,"c":0},{"w":"harvard","n":2,"t":2,"m":1280,"c":0},{"w":"heure","n":2,"t":4,"m":16896,"c":0},{"w":"heures","n":2,"t":2,"m":514,"c":0},{"w":"hésite","n":2,"t":3,"m":16388,"c":0},{"w":"ici","n":2,"t":2,"m":18432,"c":0},{"w":"identiques","n":2,"t":2,"m":160,"c":0},{"w":"iii","n":2,"t":5,"m":4352,"c":0},{"w":"image","n":2,"t":3,"m":12288,"c":0},{"w":"importe","n":2,"t":3,"m":8256,"c":0},{"w":"impératif","n":2,"t":2,"m":4224,"c":0},{"w":"index","n":2,"t":2,"m":6144,"c":0},{"w":"intact","n":2,"t":2,"m":12288,"c":0},{"w":"intacte","n":2,"t":2,"m":384,"c":0},{"w":"inter","n":2,"t":4,"m":9216,"c":0},{"w":"inversé","n":2,"t":2,"m":4608,"c":0},{"w":"jette","n":2,"t":4,"m":96,"c":0},{"w":"jouable","n":2,"t":2,"m":16640,"c":0},{"w":"jours","n":2,"t":3,"m":16416,"c":0},{"w":"laisser","n":2,"t":2,"m":6,"c":0},{"w":"laos","n":2,"t":3,"m":96,"c":0},{"w":"latin","n":2,"t":4,"m":4160,"c":0},{"w":"lecture","n":2,"t":2,"m":12288,"c":0},{"w":"littérature","n":2,"t":2,"m":2112,"c":0},{"w":"livrable","n":2,"t":2,"m":513,"c":0},{"w":"livre","n":2,"t":8,"m":4160,"c":0},{"w":"livres","n":2,"t":3,"m":4160,"c":0},{"w":"liège","n":2,"t":3,"m":48,"c":0},{"w":"longtemps","n":2,"t":2,"m":5120,"c":0},{"w":"longue","n":2,"t":2,"m":16896,"c":0},{"w":"lufs","n":2,"t":3,"m":16512,"c":0},{"w":"maison","n":2,"t":4,"m":3072,"c":0},{"w":"mal","n":2,"t":3,"m":96,"c":0},{"w":"manquait","n":2,"t":2,"m":4160,"c":0},{"w":"max","n":2,"t":2,"m":16416,"c":0},{"w":"meilleur","n":2,"t":2,"m":1056,"c":0},{"w":"mesurée","n":2,"t":2,"m":9216,"c":0},{"w":"met","n":2,"t":3,"m":192,"c":0},{"w":"min","n":2,"t":6,"m":768,"c":0},{"w":"minutes","n":2,"t":3,"m":1040,"c":0},{"w":"montent","n":2,"t":2,"m":17408,"c":0},{"w":"moteur","n":2,"t":2,"m":160,"c":0},{"w":"motif","n":2,"t":2,"m":96,"c":0},{"w":"motifs","n":2,"t":6,"m":2080,"c":0},{"w":"moyenne","n":2,"t":7,"m":8256,"c":0},{"w":"mp","n":2,"t":2,"m":16416,"c":0},{"w":"ms","n":2,"t":3,"m":17408,"c":0},{"w":"music","n":2,"t":2,"m":144,"c":0},{"w":"musical","n":2,"t":2,"m":96,"c":0},{"w":"mélodie","n":2,"t":3,"m":2176,"c":0},{"w":"mêmes","n":2,"t":2,"m":16416,"c":0},{"w":"narcisse","n":2,"t":6,"m":12288,"c":0},{"w":"net","n":2,"t":2,"m":16512,"c":0},{"w":"neuf","n":2,"t":3,"m":4128,"c":0},{"w":"niveau","n":2,"t":2,"m":16416,"c":0},{"w":"niveaux","n":2,"t":2,"m":16416,"c":0},{"w":"nombres","n":2,"t":2,"m":1536,"c":0},{"w":"nomme","n":2,"t":2,"m":768,"c":0},{"w":"nouveau","n":2,"t":2,"m":6144,"c":0},{"w":"nulle","n":2,"t":3,"m":16448,"c":0},{"w":"né","n":2,"t":2,"m":16400,"c":0},{"w":"néons","n":2,"t":3,"m":48,"c":0},{"w":"ok","n":2,"t":2,"m":24576,"c":0},{"w":"outro","n":2,"t":3,"m":1152,"c":0},{"w":"paire","n":2,"t":3,"m":8224,"c":0},{"w":"paires","n":2,"t":2,"m":2080,"c":0},{"w":"part","n":2,"t":6,"m":16448,"c":0},{"w":"partielle","n":2,"t":2,"m":384,"c":0},{"w":"partir","n":2,"t":2,"m":640,"c":0},{"w":"partition","n":2,"t":4,"m":768,"c":0},{"w":"passe","n":2,"t":3,"m":4224,"c":0},{"w":"passes","n":2,"t":2,"m":384,"c":0},{"w":"passé","n":2,"t":2,"m":576,"c":0},{"w":"petite","n":2,"t":2,"m":768,"c":0},{"w":"peuple","n":2,"t":2,"m":96,"c":0},{"w":"phaéton","n":2,"t":4,"m":384,"c":0},{"w":"piano","n":2,"t":2,"m":8320,"c":0},{"w":"pierre","n":2,"t":6,"m":96,"c":0},{"w":"pile","n":2,"t":3,"m":2112,"c":0},{"w":"plaisir","n":2,"t":2,"m":16896,"c":0},{"w":"pochette","n":2,"t":4,"m":16896,"c":0},{"w":"posé","n":2,"t":2,"m":4608,"c":0},{"w":"pouvait","n":2,"t":2,"m":4352,"c":0},{"w":"presque","n":2,"t":3,"m":16416,"c":0},{"w":"presse","n":2,"t":2,"m":1536,"c":0},{"w":"problème","n":2,"t":2,"m":1536,"c":0},{"w":"prochain","n":2,"t":2,"m":80,"c":0},{"w":"proche","n":2,"t":2,"m":8224,"c":0},{"w":"projects","n":2,"t":2,"m":160,"c":0},{"w":"prompt","n":2,"t":2,"m":160,"c":0},{"w":"prouver","n":2,"t":2,"m":16400,"c":0},{"w":"précédente","n":2,"t":2,"m":16448,"c":0},{"w":"public","n":2,"t":2,"m":288,"c":0},{"w":"pur","n":2,"t":5,"m":16448,"c":0},{"w":"pure","n":2,"t":2,"m":24576,"c":0},{"w":"période","n":2,"t":3,"m":544,"c":0},{"w":"quelqu","n":2,"t":2,"m":4112,"c":0},{"w":"quinze","n":2,"t":3,"m":4160,"c":0},{"w":"raison","n":2,"t":2,"m":5120,"c":0},{"w":"rater","n":2,"t":4,"m":257,"c":0},{"w":"ratés","n":2,"t":2,"m":16448,"c":0},{"w":"regarde","n":2,"t":2,"m":20480,"c":0},{"w":"rejoue","n":2,"t":5,"m":2560,"c":0},{"w":"remane","n":2,"t":5,"m":12288,"c":0},{"w":"rendait","n":2,"t":2,"m":4128,"c":0},{"w":"repeuple","n":2,"t":2,"m":96,"c":0},{"w":"ressemblent","n":2,"t":2,"m":4128,"c":0},{"w":"ressens","n":2,"t":2,"m":8224,"c":0},{"w":"restera","n":2,"t":2,"m":17408,"c":0},{"w":"resté","n":2,"t":2,"m":16386,"c":0},{"w":"retombe","n":2,"t":2,"m":16448,"c":0},{"w":"retrouve","n":2,"t":2,"m":1088,"c":0},{"w":"revenir","n":2,"t":2,"m":16416,"c":0},{"w":"rms","n":2,"t":3,"m":1280,"c":0},{"w":"route","n":2,"t":3,"m":16400,"c":0},{"w":"répond","n":2,"t":3,"m":24576,"c":0},{"w":"répété","n":2,"t":2,"m":2056,"c":0},{"w":"rêvé","n":2,"t":6,"m":1536,"c":0},{"w":"sauf","n":2,"t":2,"m":96,"c":0},{"w":"savait","n":2,"t":2,"m":384,"c":0},{"w":"scan","n":2,"t":3,"m":4160,"c":0},{"w":"sept","n":2,"t":3,"m":16416,"c":0},{"w":"signal","n":2,"t":5,"m":8704,"c":0},{"w":"signaux","n":2,"t":5,"m":48,"c":0},{"w":"sillon","n":2,"t":5,"m":1536,"c":0},{"w":"similarité","n":2,"t":2,"m":2080,"c":0},{"w":"sinusoïde","n":2,"t":3,"m":24576,"c":0},{"w":"sixième","n":2,"t":2,"m":24576,"c":0},{"w":"soit","n":2,"t":2,"m":2080,"c":0},{"w":"somata","n":2,"t":3,"m":576,"c":0},{"w":"sons","n":2,"t":2,"m":768,"c":0},{"w":"sort","n":2,"t":2,"m":160,"c":0},{"w":"spectre","n":2,"t":4,"m":9216,"c":0},{"w":"suffit","n":2,"t":3,"m":24576,"c":0},{"w":"série","n":2,"t":3,"m":17408,"c":0},{"w":"tel","n":2,"t":2,"m":34,"c":0},{"w":"telegram","n":2,"t":2,"m":16896,"c":0},{"w":"telle","n":2,"t":2,"m":24576,"c":0},{"w":"temps","n":2,"t":2,"m":16416,"c":0},{"w":"tendres","n":2,"t":5,"m":48,"c":0},{"w":"tenir","n":2,"t":2,"m":768,"c":0},{"w":"the","n":2,"t":2,"m":2080,"c":0},{"w":"time","n":2,"t":2,"m":544,"c":0},{"w":"tirage","n":2,"t":2,"m":96,"c":0},{"w":"titres","n":2,"t":7,"m":48,"c":0},{"w":"tonique","n":2,"t":4,"m":9216,"c":0},{"w":"tourné","n":2,"t":2,"m":12288,"c":0},{"w":"traduction","n":2,"t":2,"m":4160,"c":0},{"w":"train","n":2,"t":3,"m":640,"c":0},{"w":"transformé","n":2,"t":2,"m":8320,"c":0},{"w":"travail","n":2,"t":2,"m":160,"c":0},{"w":"troisième","n":2,"t":3,"m":96,"c":0},{"w":"trouver","n":2,"t":2,"m":16640,"c":0},{"w":"téléchargé","n":2,"t":2,"m":8256,"c":0},{"w":"ventilateur","n":2,"t":3,"m":3,"c":0},{"w":"versions","n":2,"t":2,"m":96,"c":0},{"w":"veux","n":2,"t":2,"m":8448,"c":0},{"w":"vie","n":2,"t":4,"m":384,"c":0},{"w":"vit","n":2,"t":2,"m":12288,"c":0},{"w":"volontairement","n":2,"t":2,"m":17,"c":0},{"w":"volume","n":2,"t":2,"m":160,"c":0},{"w":"vérification","n":2,"t":2,"m":16416,"c":0},{"w":"wav","n":2,"t":10,"m":24576,"c":0},{"w":"welch","n":2,"t":2,"m":24576,"c":0},{"w":"échec","n":2,"t":3,"m":16416,"c":0},{"w":"écho","n":2,"t":6,"m":12288,"c":0},{"w":"écoute","n":2,"t":3,"m":1152,"c":0},{"w":"abîmé","n":1,"t":1,"m":256,"c":0},{"w":"accrocheur","n":1,"t":1,"m":2048,"c":0},{"w":"accéléré","n":1,"t":1,"m":8192,"c":0},{"w":"acquis","n":1,"t":1,"m":16384,"c":0},{"w":"amplifiée","n":1,"t":1,"m":128,"c":0},{"w":"anglaises","n":1,"t":1,"m":128,"c":0},{"w":"annonçait","n":1,"t":1,"m":32,"c":0},{"w":"apprendre","n":1,"t":1,"m":512,"c":0},{"w":"arc","n":1,"t":4,"m":1024,"c":0},{"w":"arrivées","n":1,"t":1,"m":512,"c":0},{"w":"attirail","n":1,"t":1,"m":256,"c":0},{"w":"audio","n":1,"t":1,"m":128,"c":0},{"w":"baiser","n":1,"t":2,"m":4096,"c":0},{"w":"bilingue","n":1,"t":1,"m":4096,"c":0},{"w":"bo","n":1,"t":3,"m":512,"c":0},{"w":"bouclé","n":1,"t":1,"m":128,"c":0},{"w":"bouteille","n":1,"t":1,"m":512,"c":0},{"w":"caché","n":1,"t":1,"m":64,"c":0},{"w":"cachés","n":1,"t":1,"m":64,"c":0},{"w":"caduc","n":1,"t":4,"m":64,"c":0},{"w":"caractères","n":1,"t":1,"m":2048,"c":0},{"w":"carter","n":1,"t":1,"m":512,"c":0},{"w":"cause","n":1,"t":1,"m":32,"c":0},{"w":"centroïde","n":1,"t":1,"m":4096,"c":0},{"w":"chair","n":1,"t":1,"m":64,"c":0},{"w":"chant","n":1,"t":1,"m":8192,"c":0},{"w":"chantait","n":1,"t":1,"m":8192,"c":0},{"w":"chantée","n":1,"t":1,"m":128,"c":0},{"w":"chaud","n":1,"t":1,"m":1024,"c":0},{"w":"cheveu","n":1,"t":1,"m":8192,"c":0},{"w":"choeur","n":1,"t":1,"m":2048,"c":0},{"w":"commencer","n":1,"t":1,"m":128,"c":0},{"w":"comparées","n":1,"t":1,"m":32,"c":0},{"w":"complet","n":1,"t":1,"m":1024,"c":0},{"w":"complètes","n":1,"t":1,"m":512,"c":0},{"w":"complémentaires","n":1,"t":1,"m":512,"c":0},{"w":"comptage","n":1,"t":1,"m":32,"c":0},{"w":"conclut","n":1,"t":1,"m":256,"c":0},{"w":"connaîtrai","n":1,"t":1,"m":16384,"c":0},{"w":"constellation","n":1,"t":2,"m":32,"c":0},{"w":"contenu","n":1,"t":1,"m":256,"c":0},{"w":"continu","n":1,"t":1,"m":256,"c":0},{"w":"contour","n":1,"t":1,"m":2048,"c":0},{"w":"controles","n":1,"t":2,"m":8192,"c":0},{"w":"copiée","n":1,"t":1,"m":4096,"c":0},{"w":"corr","n":1,"t":2,"m":8192,"c":0},{"w":"coupé","n":1,"t":1,"m":16384,"c":0},{"w":"coupée","n":1,"t":1,"m":64,"c":0},{"w":"creuse","n":1,"t":1,"m":2048,"c":0},{"w":"cru","n":1,"t":1,"m":1024,"c":0},{"w":"dehors","n":1,"t":1,"m":512,"c":0},{"w":"del","n":1,"t":1,"m":64,"c":0},{"w":"descend","n":1,"t":1,"m":1024,"c":0},{"w":"destructeur","n":1,"t":1,"m":64,"c":0},{"w":"distinction","n":1,"t":1,"m":1024,"c":0},{"w":"données","n":1,"t":1,"m":32,"c":0},{"w":"décalait","n":1,"t":1,"m":64,"c":0},{"w":"décidée","n":1,"t":1,"m":16384,"c":0},{"w":"délivrée","n":1,"t":1,"m":32,"c":0},{"w":"détail","n":1,"t":1,"m":128,"c":0},{"w":"eeg","n":1,"t":1,"m":512,"c":0},{"w":"end","n":1,"t":1,"m":1024,"c":0},{"w":"entends","n":1,"t":1,"m":256,"c":0},{"w":"err","n":1,"t":2,"m":16384,"c":0},{"w":"erreur","n":1,"t":1,"m":32,"c":0},{"w":"espèce","n":1,"t":2,"m":8192,"c":0},{"w":"exacta","n":1,"t":1,"m":64,"c":0},{"w":"exige","n":1,"t":1,"m":256,"c":0},{"w":"explicite","n":1,"t":1,"m":32,"c":0},{"w":"expérience","n":1,"t":2,"m":32,"c":0},{"w":"fils","n":1,"t":2,"m":32,"c":0},{"w":"final","n":1,"t":1,"m":4096,"c":0},{"w":"finie","n":1,"t":1,"m":16384,"c":0},{"w":"flatness","n":1,"t":3,"m":16384,"c":0},{"w":"flemme","n":1,"t":1,"m":16,"c":0},{"w":"forcément","n":1,"t":1,"m":32,"c":0},{"w":"fredonner","n":1,"t":1,"m":32,"c":0},{"w":"fremit","n":1,"t":1,"m":16384,"c":0},{"w":"fruit","n":1,"t":1,"m":32,"c":0},{"w":"fréquences","n":1,"t":1,"m":64,"c":0},{"w":"geste","n":1,"t":1,"m":16384,"c":0},{"w":"global","n":1,"t":1,"m":8192,"c":0},{"w":"gorge","n":1,"t":2,"m":32,"c":0},{"w":"greek","n":1,"t":1,"m":64,"c":0},{"w":"grossière","n":1,"t":1,"m":8192,"c":0},{"w":"générer","n":1,"t":1,"m":32,"c":0},{"w":"généré","n":1,"t":1,"m":16,"c":0},{"w":"habet","n":1,"t":1,"m":4096,"c":0},{"w":"hash","n":1,"t":1,"m":64,"c":0},{"w":"hauts","n":1,"t":1,"m":8192,"c":0},{"w":"hésitation","n":1,"t":4,"m":16384,"c":0},{"w":"hésiter","n":1,"t":2,"m":16384,"c":0},{"w":"illisible","n":1,"t":1,"m":16,"c":0},{"w":"individu","n":1,"t":1,"m":8192,"c":0},{"w":"indépendantes","n":1,"t":1,"m":128,"c":0},{"w":"intensité","n":1,"t":1,"m":1024,"c":0},{"w":"intimate","n":1,"t":3,"m":128,"c":0},{"w":"involontaires","n":1,"t":1,"m":256,"c":0},{"w":"justifiées","n":1,"t":1,"m":4096,"c":0},{"w":"lisant","n":1,"t":1,"m":128,"c":0},{"w":"liu","n":1,"t":1,"m":512,"c":0},{"w":"livrables","n":1,"t":1,"m":256,"c":0},{"w":"marche","n":1,"t":1,"m":16384,"c":0},{"w":"matinée","n":1,"t":1,"m":16384,"c":0},{"w":"matériellement","n":1,"t":1,"m":64,"c":0},{"w":"membres","n":1,"t":1,"m":32,"c":0},{"w":"menti","n":1,"t":1,"m":32,"c":0},{"w":"message","n":1,"t":2,"m":2048,"c":0},{"w":"mesurait","n":1,"t":1,"m":16384,"c":0},{"w":"mi","n":1,"t":1,"m":1024,"c":0},{"w":"minuit","n":1,"t":1,"m":32,"c":0},{"w":"mode","n":1,"t":1,"m":2048,"c":0},{"w":"monte","n":1,"t":2,"m":16384,"c":0},{"w":"montrable","n":1,"t":1,"m":32,"c":0},{"w":"musiques","n":1,"t":1,"m":512,"c":0},{"w":"médiane","n":1,"t":1,"m":8192,"c":0},{"w":"mélodique","n":1,"t":1,"m":2048,"c":0},{"w":"naso","n":1,"t":1,"m":64,"c":0},{"w":"nommer","n":1,"t":1,"m":256,"c":0},{"w":"nord","n":1,"t":1,"m":8192,"c":0},{"w":"notaient","n":1,"t":1,"m":64,"c":0},{"w":"nouvelle","n":1,"t":1,"m":64,"c":0},{"w":"nouvelles","n":1,"t":1,"m":64,"c":0},{"w":"numérotation","n":1,"t":1,"m":64,"c":0},{"w":"océan","n":1,"t":1,"m":8192,"c":0},{"w":"osé","n":1,"t":1,"m":1024,"c":0},{"w":"passer","n":1,"t":1,"m":16384,"c":0},{"w":"pcm","n":1,"t":1,"m":16384,"c":0},{"w":"peak","n":1,"t":1,"m":128,"c":0},{"w":"peigne","n":1,"t":1,"m":4096,"c":0},{"w":"petitesse","n":1,"t":1,"m":512,"c":0},{"w":"pianiste","n":1,"t":1,"m":256,"c":0},{"w":"plaide","n":1,"t":1,"m":64,"c":0},{"w":"plancher","n":1,"t":1,"m":32,"c":0},{"w":"plateau","n":1,"t":1,"m":2048,"c":0},{"w":"pluie","n":1,"t":1,"m":16,"c":0},{"w":"pmel","n":1,"t":2,"m":8192,"c":0},{"w":"pochettes","n":1,"t":1,"m":16,"c":0},{"w":"pont","n":1,"t":1,"m":128,"c":0},{"w":"prison","n":1,"t":1,"m":2048,"c":0},{"w":"prochaine","n":1,"t":1,"m":512,"c":0},{"w":"produisent","n":1,"t":1,"m":8192,"c":0},{"w":"présente","n":1,"t":1,"m":1024,"c":0},{"w":"quelconque","n":1,"t":1,"m":32,"c":0},{"w":"raisons","n":1,"t":1,"m":1024,"c":0},{"w":"recherche","n":1,"t":1,"m":32,"c":0},{"w":"recommence","n":1,"t":1,"m":64,"c":0},{"w":"reconnaît","n":1,"t":1,"m":32,"c":0},{"w":"reconnues","n":1,"t":1,"m":16384,"c":0},{"w":"regardant","n":1,"t":1,"m":2048,"c":0},{"w":"reik","n":1,"t":3,"m":2048,"c":0},{"w":"remplit","n":1,"t":1,"m":16,"c":0},{"w":"rendues","n":1,"t":1,"m":1024,"c":0},{"w":"respire","n":1,"t":1,"m":16384,"c":0},{"w":"ressemble","n":1,"t":1,"m":8192,"c":0},{"w":"restants","n":1,"t":1,"m":512,"c":0},{"w":"restées","n":1,"t":1,"m":64,"c":0},{"w":"retenir","n":1,"t":1,"m":8192,"c":0},{"w":"retrouvent","n":1,"t":1,"m":8192,"c":0},{"w":"revérifié","n":1,"t":1,"m":64,"c":0},{"w":"rigueur","n":1,"t":2,"m":16384,"c":0},{"w":"romain","n":1,"t":1,"m":64,"c":0},{"w":"romaines","n":1,"t":1,"m":64,"c":0},{"w":"réelles","n":1,"t":1,"m":64,"c":0},{"w":"régulière","n":1,"t":1,"m":32,"c":0},{"w":"répétition","n":1,"t":1,"m":32,"c":0},{"w":"rêver","n":1,"t":1,"m":512,"c":0},{"w":"science","n":1,"t":2,"m":2048,"c":0},{"w":"selection","n":1,"t":1,"m":512,"c":0},{"w":"sienne","n":1,"t":3,"m":8192,"c":0},{"w":"similarités","n":1,"t":1,"m":64,"c":0},{"w":"simple","n":1,"t":1,"m":2048,"c":0},{"w":"site","n":1,"t":1,"m":64,"c":0},{"w":"soi","n":1,"t":1,"m":64,"c":0},{"w":"solitude","n":1,"t":2,"m":8192,"c":0},{"w":"sujets","n":1,"t":1,"m":2048,"c":0},{"w":"système","n":1,"t":1,"m":256,"c":0},{"w":"taire","n":1,"t":2,"m":256,"c":0},{"w":"tempo","n":1,"t":4,"m":2048,"c":0},{"w":"tenu","n":1,"t":1,"m":16384,"c":0},{"w":"testis","n":1,"t":1,"m":64,"c":0},{"w":"tirésias","n":1,"t":1,"m":4096,"c":0},{"w":"tort","n":1,"t":2,"m":4096,"c":0},{"w":"touché","n":1,"t":1,"m":128,"c":0},{"w":"transcrire","n":1,"t":1,"m":8192,"c":0},{"w":"true","n":1,"t":1,"m":128,"c":0},{"w":"typographe","n":1,"t":1,"m":128,"c":0},{"w":"uranium","n":1,"t":1,"m":512,"c":0},{"w":"usu","n":1,"t":1,"m":64,"c":0},{"w":"visé","n":1,"t":2,"m":64,"c":0},{"w":"vocation","n":1,"t":1,"m":256,"c":0},{"w":"vérité","n":1,"t":1,"m":256,"c":0},{"w":"zhiyin","n":1,"t":2,"m":512,"c":0},{"w":"ziqi","n":1,"t":1,"m":512,"c":0},{"w":"écoutent","n":1,"t":1,"m":32,"c":0},{"w":"écrirai","n":1,"t":1,"m":1024,"c":0},{"w":"écrête","n":1,"t":1,"m":128,"c":0},{"w":"épaisseur","n":1,"t":1,"m":8192,"c":0},{"w":"étages","n":1,"t":2,"m":8192,"c":0},{"w":"étrange","n":1,"t":1,"m":16384,"c":0}]};
+const cv = document.getElementById('cv'), ctx = cv.getContext('2d');
+let W=0, H=0, DPR=Math.min(window.devicePixelRatio||1, 2);
+let seuil = 1, t = 0, parts = [], stars = [], boites = [], choisi = null;
+let gistVu = false;
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var x=Math.imul(a^a>>>15,1|a);x=x+Math.imul(x^x>>>7,61|x)^x;return((x^x>>>14)>>>0)/4294967296;}}
+const rng = mulberry32(23112026);
+
+class Mot {
+  constructor(d){
+    this.d = d;
+    this.x = rng()*W; this.y = 90 + rng()*(H-260);
+    this.vx = (rng()-.5)*.22; this.vy = (rng()-.5)*.16;
+    this.phase = rng()*Math.PI*2;
+    this.taille = d.c ? 15+rng()*7 : 10.5+Math.min(d.n,8)*1.1+rng()*2.5;
+    this.alpha = 0; this.cible = 1;
+    this.tombe = false; this.vr = 0; this.rot = 0; this.vyT = 0;
+    this.force = Math.min(d.n/10, 1);
+  }
+  style(){
+    if (this.d.c) return { col:[255,179,71], a:.55+.45*this.force };
+    if (this.d.n>=5) return { col:[226,214,190], a:.4+.4*this.force };
+    if (this.d.n>=2) return { col:[150,160,190], a:.28+.25*this.force };
+    return { col:[110,118,145], a:.22 };
+  }
+  update(){
+    const vent = seuil;
+    const survit = this.d.n >= vent;
+    if (!survit && !this.tombe && vent>1){
+      this.tombe = true; this.vr = (rng()-.5)*.05; this.vyT = .3+rng()*.9;
+      this.vx += (rng()-.3)*.5;
+    }
+    if (survit && this.tombe){ // le vent retombe : le mot remonte
+      this.tombe = false; this.rot = 0;
+      this.y = Math.min(this.y, H-200); this.vy = (rng()-.5)*.16;
+    }
+    if (this.tombe){
+      this.vyT += .012; this.y += this.vyT; this.x += this.vx + Math.sin(t*.02+this.phase)*.4;
+      this.rot += this.vr; this.alpha += (0 - this.alpha)*.012;
+      if (this.y > H+40){ this.y = H+40; }
+    } else {
+      this.x += this.vx + Math.sin(t*.008+this.phase)*.12;
+      this.y += this.vy + Math.cos(t*.006+this.phase)*.08;
+      if (this.x < -60) this.x = W+50; if (this.x > W+60) this.x = -50;
+      if (this.y < 80) this.vy += .01; if (this.y > H-190) this.vy -= .01;
+      const s = this.style();
+      const pul = .85 + .15*Math.sin(t*.02+this.phase);
+      this.alpha += (s.a*pul - this.alpha)*.03;
+    }
+  }
+  draw(){
+    if (this.alpha < .015) return;
+    const s = this.style();
+    const [r,g,b] = s.col;
+    ctx.save();
+    ctx.translate(this.x, this.y);
+    if (this.tombe) ctx.rotate(this.rot);
+    ctx.font = (this.d.c?'italic ':'')+this.taille.toFixed(1)+'px Georgia, serif';
+    if (this.d.c && !this.tombe){
+      ctx.shadowColor = 'rgba(255,179,71,.7)'; ctx.shadowBlur = 12;
+    }
+    ctx.fillStyle = `rgba(${r},${g},${b},${this.alpha.toFixed(3)})`;
+    ctx.fillText(this.d.w, 0, 0);
+    ctx.restore();
+    if (!this.tombe && this.alpha > .1){
+      const w = ctx.measureText(this.d.w).width || this.taille*this.d.w.length*.5;
+      boites.push({x:this.x-4, y:this.y-this.taille, w:w+8, h:this.taille+8, d:this.d});
+    }
+  }
+}
+
+function resize(){
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = W*DPR; cv.height = H*DPR;
+  cv.style.width = W+'px'; cv.style.height = H+'px';
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+}
+resize();
+
+// étoiles de fond
+for (let i=0;i<130;i++) stars.push({x:rng()*W, y:rng()*H, r:.4+rng()*1.1, p:rng()*Math.PI*2, s:.004+rng()*.012});
+
+// ordre de dessin : faibles d'abord, forts devant, noyau au-dessus
+const tries = DATA.words.slice().sort((a,b)=>a.n-b.n || (a.c-b.c));
+parts = tries.map(d=>new Mot(d));
+
+const slider = document.getElementById('seuil');
+const label = document.getElementById('seuilLabel');
+const stats = document.getElementById('stats');
+const gist = document.getElementById('gist');
+const LABELS = {1:'doux — tout flotte encore',2:'léger — les mots d\'une nuit lâchent',3:'les mots de deux nuits lâchent',4:'presque la moitié s\'en va',5:'la nuit vraie — seuil de cinq nuits',6:'plus fort — six nuits pour tenir',7:'sept nuits pour tenir',8:'huit nuits pour tenir',9:'neuf nuits pour tenir',10:'le grand vent — dix nuits, presque rien'};
+
+function majStats(){
+  const tiennent = DATA.words.filter(d=>d.n>=seuil).length;
+  const total = DATA.words.length;
+  stats.innerHTML = '<span class="tient">'+tiennent+'</span> mots tiennent · '+(total-tiennent)+' emportés — '+total+' mots dessinés : tous ceux de ≥2 nuits + 200 singletons tirés au sort (graine 23112026), sur '+DATA.stats.mots+' mots distincts';
+  label.textContent = LABELS[seuil];
+  if (seuil>=5 && !gistVu){ gist.classList.add('visible'); gistVu = true; }
+  if (seuil<5 && gistVu){ gist.classList.remove('visible'); gistVu = false; }
+}
+slider.addEventListener('input', ()=>{ seuil = +slider.value; majStats(); });
+majStats();
+
+// fiche d'un mot
+const fiche = document.getElementById('fiche');
+document.getElementById('ficheX').addEventListener('click', ()=>{ fiche.style.display='none'; choisi=null; });
+function montreFiche(d){
+  choisi = d.w;
+  document.getElementById('ficheMot').textContent = d.w;
+  document.getElementById('ficheCompte').textContent = d.n+' nuit'+(d.n>1?'s':'')+' sur 15 · '+d.t+' occurrence'+(d.t>1?'s':'')+(d.c?' · noyau':'');
+  const nuits = document.getElementById('nuits'); nuits.innerHTML='';
+  let present=[];
+  DATA.dates.forEach((date,i)=>{
+    const s=document.createElement('span');
+    const on=(d.m>>i)&1;
+    if(on){s.className='on'; present.push(date.slice(8));}
+    s.title=date; nuits.appendChild(s);
+  });
+  document.getElementById('ficheDates').textContent = 'nuits : '+present.join(', ')+' novembre';
+  fiche.style.display='block';
+}
+cv.addEventListener('click', e=>{
+  const x=e.clientX, y=e.clientY;
+  for (let i=boites.length-1;i>=0;i--){
+    const b=boites[i];
+    if (x>=b.x && x<=b.x+b.w && y>=b.y && y<=b.y+b.h){ montreFiche(b.d); return; }
+  }
+  fiche.style.display='none'; choisi=null;
+});
+window.addEventListener('resize', resize);
+
+function fond(){
+  const g = ctx.createRadialGradient(W/2,H*.45,0,W/2,H*.45,Math.max(W,H)*.75);
+  g.addColorStop(0,'#0a0d16'); g.addColorStop(1,'#04050a');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+  for (const s of stars){
+    s.p += s.s;
+    ctx.fillStyle = 'rgba(200,210,235,'+(0.12+0.18*Math.abs(Math.sin(s.p))).toFixed(3)+')';
+    ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+  }
+}
+function frame(){
+  t++;
+  boites = [];
+  fond();
+  ctx.textBaseline='alphabetic';
+  for (const p of parts){ p.update(); p.draw(); }
+  // halo du mot choisi
+  if (choisi){
+    const b = boites.find(b=>b.d.w===choisi);
+    if (b){ ctx.strokeStyle='rgba(255,179,71,.65)'; ctx.lineWidth=1;
+      ctx.strokeRect(b.x-2,b.y-2,b.w+4,b.h+4); }
+  }
+  requestAnimationFrame(frame);
+}
+frame();
+</script>
+</body>
+</html>
