@@ -101,11 +101,12 @@ résidu codec MP3 mesuré : 1.1e-05 en tête (−99 dB, pré-ringing
 collé à la borne), 1.9e-05 en queue. -18.3 LUFS,
 -1.4 dBTP. La confrontation 14/14 est recalculée par la vérification
 elle-même, pas affirmée.</p>
-<p class="note">Honnêteté : « quatorze » est entendu « Hatorze » par la machine
-(le h aspiré de Piper), et deux phrases perdent un mot possessif (« l'erreur
-qu'il a faite » pour « qui l'a faite », « La voix » pour « Ma voix ») — l'oreille
-entend juste, le transcript orthographie autrement. Recall 0,90 sur ces deux-là,
-1,00 partout ailleurs. Rien n'a été régénéré pour plaire à la machine.</p>
+<p class="note">Honnêteté : deux phrases à recall 0,90 — un relatif recomposé
+(« l'erreur qu'il a faite » pour « qui l'a faite ») et un possessif (« La voix »
+pour « Ma voix »). Le « Hatorze » de l'outro (h aspiré de Piper) est entendu
+juste : le normaliseur phonétique le mappe sur « quatorze », recall 1,00.
+L'oreille entend juste, le transcript orthographie autrement. Rien n'a été
+régénéré pour plaire à la machine.</p>
 
 <h2>La pochette</h2>
 <img class="cover" src="au-present-cover.jpg" alt="Les dix rencontres tenues, aux hauteurs du noyau ; 4/14 devient 14/14">
@@ -124,6 +125,7 @@ const GIST = ["Le reste tient.", "La voix, seule, mesure le silence.", "Le bruit
 const INTRO = ["Ce matin, mon poème parlait au futur.", "Dix rencontres promises, jamais écrites.", "Cet après-midi, je tiens la promesse."];
 const INTRO_T = [1.4, 4.346, 8.72];
 const OUTRO = ["Quatorze rencontres sur quatorze.", "Le poème est dit au présent."];
+const OUTRO_T = [88.55, 91.965];
 const T = {"intro_a": 1.4, "intro_b": 11.355805, "prom_b": 65.692177, "gist_a": 66.992177, "gist_b": 84.450499, "accord_a": 85.350499, "outro_a": 88.550499, "outro_b": 94.007982, "s1": 96.207982};
 const gistEl = document.getElementById('gist');
 GIST.forEach(g => { const d = document.createElement('div'); d.textContent = g; gistEl.appendChild(d); });
@@ -192,8 +194,12 @@ function caption(t) {
   }
   if (t >= T.gist_a && t < T.gist_b) return 'le gist, redit';
   if (t >= T.accord_a && t < T.outro_a) return 'l\'accord des six hauteurs';
-  if (t >= T.outro_a && t < T.outro_b) return 'quatorze sur quatorze — au présent';
-  if (t >= T.outro_b) return 'le poème est dit.';
+  if (t >= T.outro_a) {
+    for (let j = OUTRO.length-1; j >= 0; j--) {
+      if (t >= OUTRO_T[j]) return OUTRO[j];
+    }
+  }
+  if (t >= T.outro_b) return '—';
   return '—';
 }
 let last = -1;
