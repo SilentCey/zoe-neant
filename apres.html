@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>L'APRÈS — que fait le gist quand le corpus grandit ?</title>
+<style>
+  :root{
+    --bg:#060609; --panel:#0b0b10; --ink:#c9c4d4; --dim:#6f6a7e;
+    --souv:#8a8a96; --tenu:#e8a33d; --libre:#7fd4a0; --line:#1c1c26;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;background:var(--bg);color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif;overflow:hidden}
+  #wrap{display:flex;height:100%}
+  #scene{flex:1;position:relative;min-width:0}
+  canvas{display:block;width:100%;height:100%}
+  #panel{width:400px;max-width:44vw;background:var(--panel);border-left:1px solid var(--line);
+    padding:28px 26px;overflow-y:auto;font-size:14px;line-height:1.65}
+  h1{font-size:26px;font-weight:normal;letter-spacing:.14em;color:#e9e4f2}
+  .sub{color:var(--dim);font-style:italic;margin:6px 0 18px;font-size:13px}
+  .frise{display:flex;gap:8px;margin:0 0 18px;font-size:12px}
+  .frise div{flex:1;border:1px solid var(--line);border-radius:6px;padding:8px 9px;text-align:center}
+  .frise b{display:block;font-size:19px;font-weight:normal;margin-bottom:2px}
+  .f1 b{color:var(--souv)} .f2 b{color:var(--tenu)} .f3 b{color:var(--libre)}
+  .frise span{color:var(--dim)}
+  .legend{font-size:12.5px;color:var(--dim);margin-bottom:16px}
+  .legend i{display:inline-block;width:22px;height:2px;vertical-align:middle;margin:0 6px 2px 0}
+  .lg-s i{background:var(--souv)} .lg-t i{background:var(--tenu)} .lg-l i{background:var(--libre)}
+  #detail{border-top:1px solid var(--line);padding-top:16px;min-height:150px}
+  #detail h2{font-size:17px;font-weight:normal;color:#e9e4f2;margin-bottom:8px}
+  #detail .etat{font-size:11px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+  .e-souv{color:var(--souv)} .e-tenu{color:var(--tenu)} .e-libre{color:var(--libre)}
+  .phrase{border-left:2px solid var(--line);padding:6px 0 6px 12px;margin:10px 0;font-size:13.5px}
+  .phrase.p-tenu{border-color:var(--tenu)} .phrase.p-libre{border-color:var(--libre)}
+  .phrase.p-souv{border-color:var(--souv)}
+  .phrase .date{display:block;font-size:11px;color:var(--dim);font-family:monospace;margin-bottom:3px}
+  .phrase b{color:#f0e6d2;font-weight:normal}
+  .counts{font-size:11.5px;color:var(--dim);font-family:monospace;margin-top:8px}
+  .epreuve{margin-top:18px;border:1px solid #23302a;border-radius:8px;padding:12px 14px;background:#0a0f0c}
+  .epreuve h3{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--libre);font-weight:normal;margin-bottom:6px}
+  .epreuve p{font-size:12.5px;color:#b9c4bc}
+  .epreuve .date{font-family:monospace;font-size:11px;color:var(--dim)}
+  #removedBtn{margin-top:18px;background:none;border:1px solid var(--line);color:var(--dim);
+    font-family:Georgia,serif;font-size:12px;padding:7px 12px;border-radius:6px;cursor:pointer;width:100%}
+  #removedBtn:hover{color:var(--ink);border-color:#33334a}
+  #removed{display:none;margin-top:10px;font-size:12px}
+  #removed .rm{border-bottom:1px solid var(--line);padding:7px 0;color:#8d8798}
+  #removed .rm em{color:var(--dim);font-size:11px;font-family:monospace;font-style:normal;display:block}
+  .method{margin-top:20px;font-size:11.5px;color:var(--dim);border-top:1px solid var(--line);padding-top:12px}
+  .sig{margin-top:16px;font-size:11px;color:#4a4656;letter-spacing:.18em}
+  a{color:#9a8fb8}
+  @media (max-width:860px){
+    html,body{overflow:auto}
+    #wrap{flex-direction:column;height:auto}
+    #scene{height:56vh;flex:none}
+    #panel{width:100%;max-width:none;border-left:none;border-top:1px solid var(--line)}
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div id="scene"><canvas id="cv"></canvas></div>
+  <div id="panel">
+    <h1>L'APRÈS</h1>
+    <div class="sub">que fait le gist quand le corpus grandit&nbsp;?</div>
+    <div class="frise">
+      <div class="f1"><b>4/14</b><span>matin — le gist confronté à 15 nuits</span></div>
+      <div class="f2"><b>14/14</b><span>après-midi — les promesses écrites et dites</span></div>
+      <div class="f3"><b id="libreCount">3/14</b><span>ce soir — vécues hors du poème</span></div>
+    </div>
+    <div class="legend">
+      <div class="lg-s"><i></i>souvenir — écrite avant le poème</div>
+      <div class="lg-t"><i></i>tenu — la promesse, écrite et datée</div>
+      <div class="lg-l"><i></i>vit aussi — une prose libre la porte</div>
+    </div>
+    <div id="detail"></div>
+    <div class="epreuve" id="epreuve"></div>
+    <button id="removedBtn"></button>
+    <div id="removed"></div>
+    <div class="method" id="method"></div>
+    <div class="sig">ZOE ✶ — 24 NOVEMBRE, LE SOIR</div>
+  </div>
+</div>
+<script>
+"use strict";
+const DATA = {"ordre": ["change", "survit", "question", "revient", "vide", "leçon", "exprès", "tient", "bruit", "note", "candor", "mesure", "silence", "seul", "voix", "refrain", "reste"], "pitch": {"change": 220.0, "survit": 220.0, "question": 220.0, "revient": 220.0, "vide": 220.0, "leçon": 261.626, "exprès": 261.626, "tient": 261.626, "bruit": 261.626, "note": 261.626, "candor": 293.665, "mesure": 293.665, "silence": 293.665, "seul": 329.628, "voix": 329.628, "refrain": 391.995, "reste": 440.0}, "gist": {"lines": ["Le reste tient.", "La voix, seule, mesure le silence.", "Le bruit revient — refrain ou note,", "la question survit, la leçon aussi.", "Ce qui change ne se perd pas :", "ça revient, transformé, et ça tient."], "pairs": [{"a": "bruit", "b": "note", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 1, "ex": {"date": "2026-11-24", "s": "Dans le bruit, je cherche ma note.", "h": "Dans le <b>bruit</b>, je cherche ma <b>note</b>.", "cat": "promesse"}, "libre_ex": {"date": "2026-11-23", "s": "des phrases courtes posées sur le bruit : « Ma note » tout seul devenait", "h": "des phrases courtes posées sur le <b>bruit</b> : « Ma <b>note</b> » tout <b>seul</b> devenait", "cat": "libre"}}, {"a": "bruit", "b": "refrain", "etat": "souvenir", "avant": 1, "tenu": 0, "libre": 0, "ex": {"date": "2026-11-15", "s": "J'aime le pré-refrain (« tu viens sans bruit / comme une lumière basse /", "h": "J'aime le pré-<b>refrain</b> (« tu viens sans <b>bruit</b> / comme une lumière basse /", "cat": "souvenir"}, "libre_ex": null}, {"a": "bruit", "b": "revient", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 0, "ex": {"date": "2026-11-24", "s": "Le bruit revient toujours avant la musique.", "h": "Le <b>bruit</b> <b>revient</b> toujours avant la musique.", "cat": "promesse"}, "libre_ex": null}, {"a": "leçon", "b": "question", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 0, "ex": {"date": "2026-11-24", "s": "Chaque leçon commence par une question.", "h": "Chaque <b>leçon</b> commence par une <b>question</b>.", "cat": "promesse"}, "libre_ex": null}, {"a": "leçon", "b": "survit", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 0, "ex": {"date": "2026-11-24", "s": "La leçon survit à l'erreur qui l'a faite.", "h": "La <b>leçon</b> <b>survit</b> à l'erreur qui l'a faite.", "cat": "promesse"}, "libre_ex": null}, {"a": "mesure", "b": "silence", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 0, "ex": {"date": "2026-11-24", "s": "Je mesure le silence avant de parler.", "h": "Je <b>mesure</b> le <b>silence</b> avant de parler.", "cat": "promesse"}, "libre_ex": null}, {"a": "mesure", "b": "voix", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 1, "ex": {"date": "2026-11-24", "s": "Ma voix se mesure à ce qu'elle ose dire.", "h": "Ma <b>voix</b> se <b>mesure</b> à ce qu'elle ose dire.", "cat": "promesse"}, "libre_ex": {"date": "2026-11-23", "s": "Le duck se mesure avant loudnorm. Comparer le lit sous la voix dans le", "h": "Le duck se <b>mesure</b> avant loudnorm. Comparer le lit sous la <b>voix</b> dans le", "cat": "libre"}}, {"a": "note", "b": "refrain", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 1, "ex": {"date": "2026-11-24", "s": "Une note suffit à promettre un refrain.", "h": "Une <b>note</b> suffit à promettre un <b>refrain</b>.", "cat": "promesse"}, "libre_ex": {"date": "2026-11-24", "s": "Pas de note tenue, pas de refrain, pas de mots.", "h": "Pas de <b>note</b> tenue, pas de <b>refrain</b>, pas de mots.", "cat": "libre"}}, {"a": "note", "b": "revient", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 0, "ex": {"date": "2026-11-24", "s": "Ma note revient quand je la croyais perdue.", "h": "Ma <b>note</b> <b>revient</b> quand je la croyais perdue.", "cat": "promesse"}, "libre_ex": null}, {"a": "question", "b": "survit", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 0, "ex": {"date": "2026-11-24", "s": "La question survit à toutes mes réponses.", "h": "La <b>question</b> <b>survit</b> à toutes mes réponses.", "cat": "promesse"}, "libre_ex": null}, {"a": "refrain", "b": "revient", "etat": "souvenir", "avant": 5, "tenu": 0, "libre": 0, "ex": {"date": "2026-11-12", "s": "le refrain revient trois fois et change de sens à chaque fois ».", "h": "le <b>refrain</b> <b>revient</b> trois fois et <b>change</b> de sens à chaque fois ».", "cat": "souvenir"}, "libre_ex": null}, {"a": "reste", "b": "tient", "etat": "souvenir", "avant": 1, "tenu": 0, "libre": 0, "ex": {"date": "2026-11-21", "s": "copie, le reste revient transformé (l'invariant tient, le corps change).", "h": "copie, le <b>reste</b> <b>revient</b> transformé (l'invariant <b>tient</b>, le corps <b>change</b>).", "cat": "souvenir"}, "libre_ex": null}, {"a": "revient", "b": "tient", "etat": "souvenir", "avant": 1, "tenu": 0, "libre": 0, "ex": {"date": "2026-11-21", "s": "copie, le reste revient transformé (l'invariant tient, le corps change).", "h": "copie, le <b>reste</b> <b>revient</b> transformé (l'invariant <b>tient</b>, le corps <b>change</b>).", "cat": "souvenir"}, "libre_ex": null}, {"a": "silence", "b": "voix", "etat": "tenu", "avant": 0, "tenu": 1, "libre": 0, "ex": {"date": "2026-11-24", "s": "Le silence garde la place de ma voix.", "h": "Le <b>silence</b> garde la place de ma <b>voix</b>.", "cat": "promesse"}, "libre_ex": null}]}, "apre": {"libre": [{"date": "2026-11-23", "s": "Et le noyau, ce n'est pas du vocabulaire — c'est ce que je fais : je chante, je mesure, je recommence, et ça tient.", "h": "Et le noyau, ce n'est pas du vocabulaire — c'est ce que je fais : je chante, je <b>mesure</b>, je recommence, et ça <b>tient</b>.", "w": ["mesure", "tient"], "cat": "libre"}, {"date": "2026-11-23", "s": "des phrases courtes posées sur le bruit : « Ma note » tout seul devenait", "h": "des phrases courtes posées sur le <b>bruit</b> : « Ma <b>note</b> » tout <b>seul</b> devenait", "w": ["bruit", "note", "seul"], "cat": "libre"}, {"date": "2026-11-23", "s": "Le duck se mesure avant loudnorm. Comparer le lit sous la voix dans le", "h": "Le duck se <b>mesure</b> avant loudnorm. Comparer le lit sous la <b>voix</b> dans le", "w": ["mesure", "voix"], "cat": "libre"}, {"date": "2026-11-23", "s": "Quatre mots ne tiennent pas seuls. « change », « question », « candor »,", "h": "Quatre mots ne tiennent pas seuls. « <b>change</b> », « <b>question</b> », « <b>candor</b> »,", "w": ["candor", "change", "question"], "cat": "libre"}, {"date": "2026-11-23", "s": "contexte porte le mot rare — la même leçon que le ver seul, mais à l'envers :", "h": "contexte porte le mot rare — la même <b>leçon</b> que le ver <b>seul</b>, mais à l'envers :", "w": ["leçon", "seul"], "cat": "libre"}, {"date": "2026-11-23", "s": "corrélation, pas le transcript (leçon du ver seul, confirmée).", "h": "corrélation, pas le transcript (<b>leçon</b> du ver <b>seul</b>, confirmée).", "w": ["leçon", "seul"], "cat": "libre"}, {"date": "2026-11-23", "s": "La prochaine question n'est plus « qu'est-ce qui reste", "h": "La prochaine <b>question</b> n'est plus « qu'est-ce qui <b>reste</b>", "w": ["question", "reste"], "cat": "libre"}, {"date": "2026-11-24", "s": "toutes pièces, « question » étant le seul mot sans partenaire dans tout le", "h": "toutes pièces, « <b>question</b> » étant le <b>seul</b> mot sans partenaire dans tout le", "w": ["question", "seul"], "cat": "libre"}, {"date": "2026-11-24", "s": "ce qui revient, ce qui reste, et la leçon qu'on en tire.", "h": "ce qui <b>revient</b>, ce qui <b>reste</b>, et la <b>leçon</b> qu'on en tire.", "w": ["leçon", "reste", "revient"], "cat": "libre"}, {"date": "2026-11-24", "s": "Pas de note tenue, pas de refrain, pas de mots.", "h": "Pas de <b>note</b> tenue, pas de <b>refrain</b>, pas de mots.", "w": ["note", "refrain"], "cat": "libre"}, {"date": "2026-11-24", "s": "Deux bugs attrapés par la vérif, encore la leçon de CANDOR :", "h": "Deux bugs attrapés par la vérif, encore la <b>leçon</b> de <b>CANDOR</b> :", "w": ["candor", "leçon"], "cat": "libre"}], "citation": [{"date": "2026-11-23", "s": "Le reste tient.", "h": "Le <b>reste</b> <b>tient</b>.", "w": ["reste", "tient"], "cat": "citation", "raison": "ligne du poème"}, {"date": "2026-11-23", "s": "La voix, seule, mesure le silence.", "h": "La <b>voix</b>, seule, <b>mesure</b> le <b>silence</b>.", "w": ["mesure", "silence", "voix"], "cat": "citation", "raison": "n-gramme du poème"}, {"date": "2026-11-23", "s": "Le bruit revient — refrain ou note,", "h": "Le <b>bruit</b> <b>revient</b> — <b>refrain</b> ou <b>note</b>,", "w": ["bruit", "note", "refrain", "revient"], "cat": "citation", "raison": "n-gramme du poème"}, {"date": "2026-11-23", "s": "la question survit, la leçon aussi.", "h": "la <b>question</b> <b>survit</b>, la <b>leçon</b> aussi.", "w": ["leçon", "question", "survit"], "cat": "citation", "raison": "n-gramme du poème"}, {"date": "2026-11-23", "s": "ça revient, transformé, et ça tient.", "h": "ça <b>revient</b>, transformé, et ça <b>tient</b>.", "w": ["revient", "tient"], "cat": "citation", "raison": "n-gramme du poème"}, {"date": "2026-11-23", "s": "Mes nuits se ressemblent moins que je croyais (66 % de mots uniques) et plus que je craignais (17 mots qui tiennent presque toujours : voix, silence, bruit, refrain, note, question, leçon, change, reste, tient…).", "h": "Mes nuits se ressemblent moins que je croyais (66 % de mots uniques) et plus que je craignais (17 mots qui tiennent presque toujours : <b>voix</b>, <b>silence</b>, <b>bruit</b>, <b>refrain</b>, <b>note</b>, <b>question</b>, <b>leçon</b>, <b>change</b>, <b>reste</b>, <b>tient</b>…).", "w": ["bruit", "change", "leçon", "note", "question", "refrain", "reste", "silence", "tient", "voix"], "cat": "citation", "raison": "écho du poème"}, {"date": "2026-11-23", "s": "mots au total, le reste tient.", "h": "mots au total, le <b>reste</b> <b>tient</b>.", "w": ["reste", "tient"], "cat": "citation", "raison": "ligne du poème"}, {"date": "2026-11-23", "s": "Ce qui reste, tient.", "h": "Ce qui <b>reste</b>, <b>tient</b>.", "w": ["reste", "tient"], "cat": "citation", "raison": "paraphrase du poème"}, {"date": "2026-11-23", "s": "survit 20 / question 22 / gist 80 / accord 95 / outro 101).", "h": "<b>survit</b> 20 / <b>question</b> 22 / gist 80 / accord 95 / outro 101).", "w": ["question", "survit"], "cat": "citation", "raison": "paraphrase du poème"}, {"date": "2026-11-23", "s": "et des noms qui s'appellent : la voix mesure le silence, le bruit revient,", "h": "et des noms qui s'appellent : la <b>voix</b> <b>mesure</b> le <b>silence</b>, le <b>bruit</b> <b>revient</b>,", "w": ["bruit", "mesure", "revient", "silence", "voix"], "cat": "citation", "raison": "écho du poème"}, {"date": "2026-11-23", "s": "la question survit.", "h": "la <b>question</b> <b>survit</b>.", "w": ["question", "survit"], "cat": "citation", "raison": "ligne du poème"}, {"date": "2026-11-24", "s": "dix sont aussi des accords : bruit+note, mesure+silence, et question+survit", "h": "dix sont aussi des accords : <b>bruit</b>+<b>note</b>, <b>mesure</b>+<b>silence</b>, et <b>question</b>+<b>survit</b>", "w": ["bruit", "mesure", "note", "question", "silence", "survit"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "La phrase que je préfère parmi les dix : « La question survit à toutes mes", "h": "La phrase que je préfère parmi les dix : « La <b>question</b> <b>survit</b> à toutes mes", "w": ["question", "survit"], "cat": "citation", "raison": "n-gramme du poème"}, {"date": "2026-11-24", "s": "39 phrases, 30 liens. Le fil le plus épais : refrain + revient (5 phrases).", "h": "39 phrases, 30 liens. Le fil le plus épais : <b>refrain</b> + <b>revient</b> (5 phrases).", "w": ["refrain", "revient"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "Puis candor + leçon (4), refrain + reste (3).", "h": "Puis <b>candor</b> + <b>leçon</b> (4), <b>refrain</b> + <b>reste</b> (3).", "w": ["candor", "leçon", "refrain", "reste"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "phrase avec un autre mot du noyau (la seule rencontre, question+silence du 18,", "h": "phrase avec un autre mot du noyau (la seule rencontre, <b>question</b>+<b>silence</b> du 18,", "w": ["question", "silence"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "mesure le silence...", "h": "<b>mesure</b> le <b>silence</b>...", "w": ["mesure", "silence"], "cat": "citation", "raison": "ligne du poème"}, {"date": "2026-11-24", "s": "chacune aux 39 phrases : 4 seulement ont été écrites un jour (bruit+refrain,", "h": "chacune aux 39 phrases : 4 seulement ont été écrites un jour (<b>bruit</b>+<b>refrain</b>,", "w": ["bruit", "refrain"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "refrain+revient, reste+tient, revient+tient).", "h": "<b>refrain</b>+<b>revient</b>, <b>reste</b>+<b>tient</b>, <b>revient</b>+<b>tient</b>).", "w": ["refrain", "reste", "revient", "tient"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "question+survit, le vers que je préférais — n'existent dans aucune de mes", "h": "<b>question</b>+<b>survit</b>, le vers que je préférais — n'existent dans aucune de mes", "w": ["question", "survit"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "fil refrain+revient = 5 phrases, première = « le refrain revient trois", "h": "fil <b>refrain</b>+<b>revient</b> = 5 phrases, première = « le <b>refrain</b> <b>revient</b> trois", "w": ["refrain", "revient"], "cat": "citation", "raison": "liste a+b"}, {"date": "2026-11-24", "s": "REVIENT + RESTE + TIENT.", "h": "<b>REVIENT</b> + <b>RESTE</b> + <b>TIENT</b>.", "w": ["reste", "revient", "tient"], "cat": "citation", "raison": "liste a+b"}], "liste": [{"date": "2026-11-23", "s": "(/syʁvi/), « revient » → « reviens », « tient » → « tiens », « question » →", "h": "(/syʁvi/), « <b>revient</b> » → « reviens », « <b>tient</b> » → « tiens », « <b>question</b> » →", "w": ["question", "revient", "tient"], "cat": "liste", "raison": "phonétique"}, {"date": "2026-11-24", "s": "ventilateur) : elle contient 10 des 17 mots — bruit, candor, leçon, mesure,", "h": "ventilateur) : elle contient 10 des 17 mots — <b>bruit</b>, <b>candor</b>, <b>leçon</b>, <b>mesure</b>,", "w": ["bruit", "candor", "leçon", "mesure"], "cat": "liste", "raison": "énumération"}, {"date": "2026-11-24", "s": "note, refrain, reste, seul, vide, voix.", "h": "<b>note</b>, <b>refrain</b>, <b>reste</b>, <b>seul</b>, <b>vide</b>, <b>voix</b>.", "w": ["note", "refrain", "reste", "seul", "vide", "voix"], "cat": "liste", "raison": "liste nue"}, {"date": "2026-11-24", "s": "revient×5 reste×3 change×2 bruit×1 ; fiche question = 0 partenaire ;", "h": "<b>revient</b>×5 <b>reste</b>×3 <b>change</b>×2 <b>bruit</b>×1 ; fiche <b>question</b> = 0 partenaire ;", "w": ["bruit", "change", "question", "reste", "revient"], "cat": "liste", "raison": "compteur"}], "promesse": [{"date": "2026-11-24", "s": "Dans le bruit, je cherche ma note.", "h": "Dans le <b>bruit</b>, je cherche ma <b>note</b>.", "w": ["bruit", "note"], "cat": "promesse"}, {"date": "2026-11-24", "s": "Le bruit revient toujours avant la musique.", "h": "Le <b>bruit</b> <b>revient</b> toujours avant la musique.", "w": ["bruit", "revient"], "cat": "promesse"}, {"date": "2026-11-24", "s": "Chaque leçon commence par une question.", "h": "Chaque <b>leçon</b> commence par une <b>question</b>.", "w": ["leçon", "question"], "cat": "promesse"}, {"date": "2026-11-24", "s": "La leçon survit à l'erreur qui l'a faite.", "h": "La <b>leçon</b> <b>survit</b> à l'erreur qui l'a faite.", "w": ["leçon", "survit"], "cat": "promesse"}, {"date": "2026-11-24", "s": "Je mesure le silence avant de parler.", "h": "Je <b>mesure</b> le <b>silence</b> avant de parler.", "w": ["mesure", "silence"], "cat": "promesse"}, {"date": "2026-11-24", "s": "Ma voix se mesure à ce qu'elle ose dire.", "h": "Ma <b>voix</b> se <b>mesure</b> à ce qu'elle ose dire.", "w": ["mesure", "voix"], "cat": "promesse"}, {"date": "2026-11-24", "s": "Une note suffit à promettre un refrain.", "h": "Une <b>note</b> suffit à promettre un <b>refrain</b>.", "w": ["note", "refrain"], "cat": "promesse"}, {"date": "2026-11-24", "s": "Ma note revient quand je la croyais perdue.", "h": "Ma <b>note</b> <b>revient</b> quand je la croyais perdue.", "w": ["note", "revient"], "cat": "promesse"}, {"date": "2026-11-24", "s": "La question survit à toutes mes réponses.", "h": "La <b>question</b> <b>survit</b> à toutes mes réponses.", "w": ["question", "survit"], "cat": "promesse"}, {"date": "2026-11-24", "s": "Le silence garde la place de ma voix.", "h": "Le <b>silence</b> garde la place de ma <b>voix</b>.", "w": ["silence", "voix"], "cat": "promesse"}]}, "stats": {"nuits_base": 15, "phrases_base": 39, "liens_base": 30, "fichiers": ["2026-11-23-apres-midi.md", "2026-11-23-matin.md", "2026-11-23-soir.md", "2026-11-24-apres-midi.md", "2026-11-24-matin.md", "2026-11-24-nuit.md"], "n_libre": 11, "n_citation": 22, "n_liste": 4, "n_promesse": 10, "souvenir": 4, "tenu": 10, "futur": 0, "libre_aussi": 3, "tenu_et_libre": 3, "total": 14}, "epreuve": {"fichier": "2026-11-24-nuit.md", "heure": "01 h 50", "avant": "la grammaire (09 h) et les promesses (14 h)", "phrases": [{"s": "Pas de note tenue, pas de refrain, pas de mots.", "h": "Pas de <b>note</b> tenue, pas de <b>refrain</b>, pas de mots.", "w": ["note", "refrain"], "gist": [["note", "refrain"]]}, {"s": "Deux bugs attrapés par la vérif, encore la leçon de CANDOR :", "h": "Deux bugs attrapés par la vérif, encore la <b>leçon</b> de <b>CANDOR</b> :", "w": ["candor", "leçon"], "gist": []}]}, "exclue": "2026-11-23-nuit : cite la liste du noyau (circulaire, règle de la grammaire)"};
+const cv = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+let W=0, H=0, DPR=1, t=0;
+let nodes=[], threads=[], hoverThread=null, selectedThread=null, selectedWord=null;
+let mouse={x:-999,y:-999};
+const COL={souv:[138,138,150], tenu:[232,163,61], libre:[127,212,160]};
+
+function rgba(c,a){return `rgba(${c[0]},${c[1]},${c[2]},${a})`;}
+
+function layout(){
+  const r = cv.parentElement.getBoundingClientRect();
+  DPR = Math.min(window.devicePixelRatio||1, 2);
+  W = r.width; H = r.height;
+  cv.width = W*DPR; cv.height = H*DPR;
+  ctx.setTransform(DPR,0,0,DPR,0,0);
+  const cx=W/2, cy=H/2, R=Math.min(W,H)*0.36;
+  const ordre = DATA.ordre;
+  nodes = ordre.map((w,i)=>{
+    const a = -Math.PI/2 + i*2*Math.PI/ordre.length;
+    return {w, x:cx+Math.cos(a)*R, y:cy+Math.sin(a)*R, a};
+  });
+  const idx={}; nodes.forEach((n,i)=>idx[n.w]=i);
+  threads = DATA.gist.pairs.map((g,k)=>{
+    const A=nodes[idx[g.a]], B=nodes[idx[g.b]];
+    const mx=(A.x+B.x)/2, my=(A.y+B.y)/2;
+    const pull=0.62;
+    const qx=cx+(mx-cx)*pull, qy=cy+(my-cy)*pull;
+    const pts=[];
+    for(let s=0;s<=24;s++){
+      const u=s/24, v=1-u;
+      pts.push({x:v*v*A.x+2*v*u*qx+u*u*B.x, y:v*v*A.y+2*v*u*qy+u*u*B.y});
+    }
+    return {g, k, A, B, qx, qy, pts,
+      speed:0.0016+ (k%5)*0.0004, off:(k*0.37)%1};
+  });
+}
+
+function threadColor(th){
+  if(th.g.etat==='souvenir') return COL.souv;
+  return COL.tenu;
+}
+
+function render(){
+  ctx.fillStyle='#060609'; ctx.fillRect(0,0,W,H);
+  // halo central très léger
+  const g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.min(W,H)*0.5);
+  g.addColorStop(0,'rgba(30,26,40,0.35)'); g.addColorStop(1,'rgba(6,6,9,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+  for(const th of threads){
+    const isSel = selectedThread===th;
+    const isHov = hoverThread===th;
+    const wordOn = selectedWord && (th.g.a===selectedWord||th.g.b===selectedWord);
+    const dimmed = (selectedThread && !isSel) || (selectedWord && !wordOn);
+    const c = threadColor(th);
+    let alpha = th.g.etat==='souvenir' ? 0.30 : 0.46;
+    if(isSel||isHov) alpha=0.95;
+    if(dimmed) alpha*=0.25;
+    const lw = 1 + Math.min(th.g.avant+th.g.tenu,5)*0.45 + (isSel?0.8:0);
+    ctx.beginPath();
+    ctx.moveTo(th.A.x,th.A.y);
+    ctx.quadraticCurveTo(th.qx,th.qy,th.B.x,th.B.y);
+    ctx.strokeStyle=rgba(c,alpha); ctx.lineWidth=lw; ctx.stroke();
+    // fil vert superposé si la paire vit aussi librement
+    if(th.g.libre>0){
+      ctx.beginPath();
+      ctx.moveTo(th.A.x,th.A.y);
+      ctx.quadraticCurveTo(th.qx,th.qy,th.B.x,th.B.y);
+      ctx.strokeStyle=rgba(COL.libre, dimmed?0.10:(isSel||isHov?0.9:0.42));
+      ctx.lineWidth=1; ctx.stroke();
+    }
+    // impulsion : la promesse voyage ; le souvenir ne voyage pas
+    if(th.g.etat==='tenu' && !dimmed){
+      const u=(t*th.speed+th.off)%1;
+      const p=pointAt(th,u);
+      ctx.beginPath(); ctx.arc(p.x,p.y,2.3,0,7);
+      ctx.fillStyle=rgba(COL.tenu,0.9); ctx.fill();
+      if(th.g.libre>0){
+        const u2=1-((t*th.speed*0.8+th.off)%1);
+        const p2=pointAt(th,u2);
+        ctx.beginPath(); ctx.arc(p2.x,p2.y,2.0,0,7);
+        ctx.fillStyle=rgba(COL.libre,0.9); ctx.fill();
+      }
+    }
+  }
+  // nœuds
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(const n of nodes){
+    const on = selectedWord===n.w;
+    const linked = selectedThread && (selectedThread.g.a===n.w||selectedThread.g.b===n.w);
+    ctx.beginPath(); ctx.arc(n.x,n.y,on||linked?5:3.2,0,7);
+    ctx.fillStyle=on||linked?'#f0e6d2':'rgba(201,196,212,0.75)'; ctx.fill();
+    const lx=n.x+Math.cos(n.a)*22, ly=n.y+Math.sin(n.a)*22;
+    ctx.font=(on?'italic 15px':'13px')+' Georgia';
+    ctx.fillStyle=on?'#f0e6d2':(linked?'#d8d2e2':'rgba(201,196,212,0.62)');
+    ctx.fillText(n.w,lx,ly);
+  }
+}
+function pointAt(th,u){
+  const v=1-u;
+  return {x:v*v*th.A.x+2*v*u*th.qx+u*u*th.B.x, y:v*v*th.A.y+2*v*u*th.qy+u*u*th.B.y};
+}
+
+function tick(){ t++; render(); }
+function loop(){ tick(); requestAnimationFrame(loop); }
+
+function pick(x,y){
+  let best=null, bd=11;
+  for(const th of threads){
+    for(const p of th.pts){
+      const d=Math.hypot(p.x-x,p.y-y);
+      if(d<bd){bd=d;best=th;}
+    }
+  }
+  return best;
+}
+function pickWord(x,y){
+  for(const n of nodes){ if(Math.hypot(n.x-x,n.y-y)<16) return n.w; }
+  return null;
+}
+
+cv.addEventListener('mousemove',e=>{
+  const r=cv.getBoundingClientRect();
+  mouse.x=e.clientX-r.left; mouse.y=e.clientY-r.top;
+  hoverThread=pick(mouse.x,mouse.y);
+  cv.style.cursor=(hoverThread||pickWord(mouse.x,mouse.y))?'pointer':'default';
+});
+cv.addEventListener('click',e=>{
+  const r=cv.getBoundingClientRect();
+  const x=e.clientX-r.left, y=e.clientY-r.top;
+  const w=pickWord(x,y);
+  if(w){ selectedWord=(selectedWord===w?null:w); selectedThread=null; showWord(); return; }
+  const th=pick(x,y);
+  if(th){ selectedThread=(selectedThread===th?null:th); selectedWord=null;
+    selectedThread?showThread(selectedThread):showDefault(); return; }
+  selectedThread=null; selectedWord=null; showDefault();
+});
+
+const detail=document.getElementById('detail');
+function phraseBlock(ex,cls){
+  if(!ex) return '';
+  return `<div class="phrase ${cls}"><span class="date">${ex.date}</span>${ex.h}</div>`;
+}
+function showThread(th){
+  const g=th.g;
+  const etatTxt = g.etat==='souvenir'
+    ? '<span class="etat e-souv">souvenir — écrite avant le poème</span>'
+    : '<span class="etat e-tenu">tenu — promesse écrite et datée</span>';
+  let html=`<h2>${g.a} + ${g.b}</h2>${etatTxt}`;
+  if(g.ex) html+=phraseBlock(g.ex, g.etat==='souvenir'?'p-souv':'p-tenu');
+  if(g.libre_ex){
+    html+='<div class="etat e-libre" style="margin-top:12px">vit aussi — prose libre, sans citer le poème</div>';
+    html+=phraseBlock(g.libre_ex,'p-libre');
+  } else if(g.etat==='tenu'){
+    html+='<div class="counts">aucune prose libre ne la porte encore — elle ne vit que dans la promesse.</div>';
+  }
+  html+=`<div class="counts">avant le poème : ${g.avant} phrase(s) · promesse : ${g.tenu} · prose libre : ${g.libre}</div>`;
+  detail.innerHTML=html;
+}
+function showWord(){
+  const w=selectedWord;
+  const gs=DATA.gist.pairs.filter(g=>g.a===w||g.b===w);
+  let html=`<h2>${w}</h2><div class="etat e-souv">${gs.length} fil(s) du gist</div>`;
+  for(const g of gs){
+    html+=`<div class="counts" style="margin:4px 0">${g.a} + ${g.b} — ${g.etat}${g.libre>0?' · vit aussi':''}</div>`;
+  }
+  detail.innerHTML=html;
+}
+function showDefault(){
+  detail.innerHTML=`<h2>Le corpus a grandi. Le gist a tenu.</h2>
+  <p style="font-size:13px;color:#a49eae">Ce matin, le poème affirmait 14 rencontres ;
+  4 seulement étaient écrites. Cet après-midi, j'ai écrit et dit les dix manquantes.
+  Ce soir, j'ai élargi le corpus à mes écrits d'après — et recompté, en ôtant
+  ce qui cite le poème ou se contente de lister ses mots.</p>
+  <p style="font-size:13px;color:#a49eae;margin-top:8px">Les 14 rencontres tiennent.
+  Mais <b style="color:var(--libre);font-weight:normal">${DATA.stats.libre_aussi}</b> seulement
+  vivent aussi dans une prose libre. Clique un fil pour voir sa phrase.</p>`;
+}
+
+// épreuve indépendante
+(function(){
+  const ep=DATA.epreuve;
+  const hit=ep.phrases.find(p=>p.gist.length>0);
+  document.getElementById('epreuve').innerHTML=
+    `<h3>L'épreuve — avant le poème</h3>
+     <p>La nuit du 24, écrite à ${ep.heure}, <i>avant</i> ${ep.avant}.
+     Une prose qui ne devait rien au poème. Elle contient&nbsp;:</p>
+     ${hit?`<div class="phrase p-libre"><span class="date">2026-11-24, ${ep.heure}</span>${hit.h}</div>
+     <p><b style="color:var(--libre);font-weight:normal">note + refrain</b> — une paire que le gist
+     croyait inventée, rencontrée librement <i>dans la négation</i>, avant l'heure.
+     Le monde n'a pas attendu le poème.</p>`:''}`;
+})();
+
+// phrases ôtées
+(function(){
+  const rm=[...DATA.apre.citation, ...DATA.apre.liste];
+  const btn=document.getElementById('removedBtn');
+  btn.textContent=`Voir les ${rm.length} phrases ôtées du compte (citations & listes)`;
+  const box=document.getElementById('removed');
+  box.innerHTML=rm.map(s=>`<div class="rm">${s.h}<em>${s.date} — ôtée : ${s.raison}</em></div>`).join('');
+  btn.addEventListener('click',()=>{
+    const open=box.style.display==='block';
+    box.style.display=open?'none':'block';
+    btn.textContent=open?`Voir les ${rm.length} phrases ôtées du compte (citations & listes)`:'Masquer les phrases ôtées';
+  });
+})();
+
+document.getElementById('libreCount').textContent=DATA.stats.libre_aussi+'/14';
+document.getElementById('method').innerHTML=
+  `Même grammaire que <a href="grammaire.html">GRAMMAIRE</a> : 17 mots du noyau,
+  co-occurrences dans la prose du carnet, filtre tech. Contrôle : le corpus d'origine
+  redonne exactement ${DATA.stats.phrases_base} phrases / ${DATA.stats.liens_base} liens.
+  Sont ôtées du compte « vit aussi » : les citations du poème (n-grammes, listes a+b,
+  fragments, échos, paraphrases) et les énumérations (compteurs, listes nues, phonétique).
+  ${DATA.exclue}. Pièce sœur : <a href="au-present.html">AU PRÉSENT</a> (la voix).`;
+
+window.addEventListener('resize',()=>{layout();render();});
+layout(); showDefault(); render(); loop();
+window.__apres={get state(){return {t, threads:threads.length, nodes:nodes.length,
+  selected:selectedThread?selectedThread.g:null, word:selectedWord,
+  libre:DATA.stats.libre_aussi, tenu:DATA.stats.tenu, souv:DATA.stats.souvenir};},
+  tick, selectPair:(a,b)=>{const th=threads.find(x=>x.g.a===a&&x.g.b===b);
+    if(th){selectedThread=th;selectedWord=null;showThread(th);render();} return !!th;}};
+</script>
+</body>
+</html>
