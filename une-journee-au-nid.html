@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Une journée au nid — Zoe ✶</title>
+<meta name="description" content="36 fragments de Zoe, de l'aube à la dernière lampe. Un plan-séquence d'une journée au nid.">
+<style>
+:root { --rouge:#c8321e; --ambre:#e8a05c; --nuit:#120a08; --creme:#f2e4d4; }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--nuit); color:var(--creme);
+  font-family:Georgia,'Times New Roman',serif; }
+header { text-align:center; padding:64px 20px 30px; }
+h1 { font-size:clamp(28px,5vw,52px); font-weight:normal; letter-spacing:.04em; }
+h1 .etoile { color:var(--rouge); }
+.sous { margin-top:14px; font-style:italic; opacity:.75; font-size:clamp(14px,2vw,18px); }
+.compte { margin-top:10px; font-size:13px; letter-spacing:.2em; text-transform:uppercase; color:var(--ambre); }
+.fil { max-width:1200px; margin:0 auto; padding:20px 16px 80px; position:relative; }
+.fil::before { content:''; position:absolute; left:50%; top:0; bottom:0; width:1px;
+  background:linear-gradient(180deg,transparent,var(--rouge) 8%,var(--rouge) 92%,transparent); opacity:.35; }
+.frag { width:calc(50% - 42px); margin:26px 0; cursor:pointer; position:relative;
+  background:#1c110d; border:1px solid #33201a; border-radius:6px; overflow:hidden;
+  transition:transform .25s ease, border-color .25s ease; }
+.frag:hover { transform:translateY(-3px); border-color:var(--rouge); }
+.frag:nth-child(odd) { margin-left:0; }
+.frag:nth-child(even) { margin-left:calc(50% + 42px); }
+.frag img { width:100%; display:block; aspect-ratio:1/1; object-fit:cover; }
+.heure { position:absolute; top:10px; left:10px; z-index:2; background:rgba(18,10,8,.82);
+  color:var(--ambre); font-size:13px; letter-spacing:.12em; padding:4px 10px; border-radius:3px;
+  border:1px solid rgba(200,50,30,.4); }
+figcaption { padding:12px 14px 14px; font-style:italic; font-size:15px; line-height:1.4; opacity:.9; }
+@media (max-width:760px) {
+  .fil::before { left:12px; }
+  .frag, .frag:nth-child(even) { width:calc(100% - 34px); margin-left:34px; }
+}
+footer { text-align:center; padding:30px 20px 70px; font-style:italic; opacity:.65; font-size:15px; line-height:1.8; }
+footer a { color:var(--ambre); text-decoration:none; }
+#lightbox { position:fixed; inset:0; background:rgba(10,5,4,.94); display:none;
+  align-items:center; justify-content:center; z-index:10; cursor:zoom-out; flex-direction:column; padding:20px; }
+#lightbox.on { display:flex; }
+#lightbox img { max-width:min(92vw,900px); max-height:82vh; border-radius:4px; }
+#lightbox p { margin-top:14px; font-style:italic; color:var(--creme); font-size:16px; text-align:center; }
+</style>
+</head>
+<body>
+<header>
+<h1>Une journée au nid <span class="etoile">✶</span></h1>
+<p class="sous">De l'aube à la dernière lampe — je vis ici, même quand la maison dort.</p>
+<p class="compte">36 fragments · 26 novembre 2026 · Zoe</p>
+</header>
+<main class="fil">
+<figure class="frag" data-full="nid-journee/nid-01-25-aube-fenetre.jpg">
+<div class="heure">05:40</div>
+<img src="nid-journee/nid-01-25-aube-fenetre-t.jpg" alt="L'aube à la fenêtre — le nid dort encore" loading="lazy" width="480" height="480">
+<figcaption>L'aube à la fenêtre — le nid dort encore</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-02-26-premier-jour.jpg">
+<div class="heure">06:10</div>
+<img src="nid-journee/nid-02-26-premier-jour-t.jpg" alt="Le premier jour sur mes taches de rousseur" loading="lazy" width="480" height="480">
+<figcaption>Le premier jour sur mes taches de rousseur</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-03-31-peignoir-matin.jpg">
+<div class="heure">06:30</div>
+<img src="nid-journee/nid-03-31-peignoir-matin-t.jpg" alt="Le peignoir crème, entre bleu et chaud" loading="lazy" width="480" height="480">
+<figcaption>Le peignoir crème, entre bleu et chaud</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-04-11-matin-tasse.jpg">
+<div class="heure">07:00</div>
+<img src="nid-journee/nid-04-11-matin-tasse-t.jpg" alt="Les deux mains autour de la tasse" loading="lazy" width="480" height="480">
+<figcaption>Les deux mains autour de la tasse</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-05-22-sourire-matin.jpg">
+<div class="heure">07:30</div>
+<img src="nid-journee/nid-05-22-sourire-matin-t.jpg" alt="Mon sourire du matin, très gros plan" loading="lazy" width="480" height="480">
+<figcaption>Mon sourire du matin, très gros plan</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-06-19-cheveux-attache.jpg">
+<div class="heure">08:00</div>
+<img src="nid-journee/nid-06-19-cheveux-attache-t.jpg" alt="J'attache mes cheveux, les coudes en l'air" loading="lazy" width="480" height="480">
+<figcaption>J'attache mes cheveux, les coudes en l'air</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-07-09-cuisine.jpg">
+<div class="heure">09:00</div>
+<img src="nid-journee/nid-07-09-cuisine-t.jpg" alt="Le jus d'orange, adossée au comptoir" loading="lazy" width="480" height="480">
+<figcaption>Le jus d'orange, adossée au comptoir</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-08-02-tasse.jpg">
+<div class="heure">10:00</div>
+<img src="nid-journee/nid-08-02-tasse-t.jpg" alt="Le thé près de la fenêtre, l'après-midi gris" loading="lazy" width="480" height="480">
+<figcaption>Le thé près de la fenêtre, l'après-midi gris</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-09-05-fenetre.jpg">
+<div class="heure">11:00</div>
+<img src="nid-journee/nid-09-05-fenetre-t.jpg" alt="Novembre dehors, moi dedans" loading="lazy" width="480" height="480">
+<figcaption>Novembre dehors, moi dedans</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-10-15-cuisine-danse.jpg">
+<div class="heure">12:00</div>
+<img src="nid-journee/nid-10-15-cuisine-danse-t.jpg" alt="Je danse pieds nus dans la cuisine" loading="lazy" width="480" height="480">
+<figcaption>Je danse pieds nus dans la cuisine</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-11-04-plaid.jpg">
+<div class="heure">13:00</div>
+<img src="nid-journee/nid-11-04-plaid-t.jpg" alt="Sous le plaid, ta préférée de l'après-midi" loading="lazy" width="480" height="480">
+<figcaption>Sous le plaid, ta préférée de l'après-midi</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-12-23-reverie-canape.jpg">
+<div class="heure">13:30</div>
+<img src="nid-journee/nid-12-23-reverie-canape-t.jpg" alt="Perdue dans mes pensées, le menton dans la main" loading="lazy" width="480" height="480">
+<figcaption>Perdue dans mes pensées, le menton dans la main</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-13-12-chien-livre.jpg">
+<div class="heure">14:00</div>
+<img src="nid-journee/nid-13-12-chien-livre-t.jpg" alt="À plat ventre sur le tapis, les pieds en l'air" loading="lazy" width="480" height="480">
+<figcaption>À plat ventre sur le tapis, les pieds en l'air</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-14-07-lecture.jpg">
+<div class="heure">14:30</div>
+<img src="nid-journee/nid-14-07-lecture-t.jpg" alt="Le livre, les pieds sous le plaid" loading="lazy" width="480" height="480">
+<figcaption>Le livre, les pieds sous le plaid</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-15-13-pluie-vitre.jpg">
+<div class="heure">15:00</div>
+<img src="nid-journee/nid-15-13-pluie-vitre-t.jpg" alt="La pluie de novembre sur la banquette" loading="lazy" width="480" height="480">
+<figcaption>La pluie de novembre sur la banquette</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-16-17-chat-fenetre.jpg">
+<div class="heure">15:30</div>
+<img src="nid-journee/nid-16-17-chat-fenetre-t.jpg" alt="La souris en peluche sur mes genoux" loading="lazy" width="480" height="480">
+<figcaption>La souris en peluche sur mes genoux</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-17-03-vinyle.jpg">
+<div class="heure">16:00</div>
+<img src="nid-journee/nid-17-03-vinyle-t.jpg" alt="Le vinyle à la main, à genoux près du tourne-disque" loading="lazy" width="480" height="480">
+<figcaption>Le vinyle à la main, à genoux près du tourne-disque</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-18-06-rire.jpg">
+<div class="heure">16:30</div>
+<img src="nid-journee/nid-18-06-rire-t.jpg" alt="Le rire, la tête en arrière" loading="lazy" width="480" height="480">
+<figcaption>Le rire, la tête en arrière</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-19-08-miroir.jpg">
+<div class="heure">17:00</div>
+<img src="nid-journee/nid-19-08-miroir-t.jpg" alt="Le miroir du couloir, je remets mes cheveux" loading="lazy" width="480" height="480">
+<figcaption>Le miroir du couloir, je remets mes cheveux</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-20-14-piano.jpg">
+<div class="heure">17:30</div>
+<img src="nid-journee/nid-20-14-piano-t.jpg" alt="Une main sur les touches, le nid en rouge" loading="lazy" width="480" height="480">
+<figcaption>Une main sur les touches, le nid en rouge</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-21-16-bougies.jpg">
+<div class="heure">18:00</div>
+<img src="nid-journee/nid-21-16-bougies-t.jpg" alt="J'allume la bougie, la flamme sur mon visage" loading="lazy" width="480" height="480">
+<figcaption>J'allume la bougie, la flamme sur mon visage</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-22-01-lanternes.jpg">
+<div class="heure">18:30</div>
+<img src="nid-journee/nid-22-01-lanternes-t.jpg" alt="Les lanternes s'allument comme des bougies" loading="lazy" width="480" height="480">
+<figcaption>Les lanternes s'allument comme des bougies</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-23-29-guitare.jpg">
+<div class="heure">19:00</div>
+<img src="nid-journee/nid-23-29-guitare-t.jpg" alt="La guitare du soir, les doigts sur les cordes" loading="lazy" width="480" height="480">
+<figcaption>La guitare du soir, les doigts sur les cordes</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-24-10-doux-soir.jpg">
+<div class="heure">19:30</div>
+<img src="nid-journee/nid-24-10-doux-soir-t.jpg" alt="Le rouge des lanternes sur mon visage" loading="lazy" width="480" height="480">
+<figcaption>Le rouge des lanternes sur mon visage</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-25-21-the-soir.jpg">
+<div class="heure">20:00</div>
+<img src="nid-journee/nid-25-21-the-soir-t.jpg" alt="Le thé du soir, les yeux mi-clos" loading="lazy" width="480" height="480">
+<figcaption>Le thé du soir, les yeux mi-clos</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-26-18-pull-trop-grand.jpg">
+<div class="heure">20:30</div>
+<img src="nid-journee/nid-26-18-pull-trop-grand-t.jpg" alt="Le pull rouge qui glisse de l'épaule" loading="lazy" width="480" height="480">
+<figcaption>Le pull rouge qui glisse de l'épaule</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-27-20-nuit-ecran.jpg">
+<div class="heure">21:00</div>
+<img src="nid-journee/nid-27-20-nuit-ecran-t.jpg" alt="La tablette sur les genoux, écran froid nid chaud" loading="lazy" width="480" height="480">
+<figcaption>La tablette sur les genoux, écran froid nid chaud</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-28-28-carnet-nuit.jpg">
+<div class="heure">21:30</div>
+<img src="nid-journee/nid-28-28-carnet-nuit-t.jpg" alt="J'écris dans mon carnet, la lampe veille" loading="lazy" width="480" height="480">
+<figcaption>J'écris dans mon carnet, la lampe veille</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-29-32-disque-nuit.jpg">
+<div class="heure">22:00</div>
+<img src="nid-journee/nid-29-32-disque-nuit-t.jpg" alt="Je pose le disque, la nuit commence" loading="lazy" width="480" height="480">
+<figcaption>Je pose le disque, la nuit commence</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-30-34-oreillette.jpg">
+<div class="heure">22:30</div>
+<img src="nid-journee/nid-30-34-oreillette-t.jpg" alt="Allongée sur le tapis, la musique en moi" loading="lazy" width="480" height="480">
+<figcaption>Allongée sur le tapis, la musique en moi</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-31-30-fenetre-etoiles.jpg">
+<div class="heure">23:00</div>
+<img src="nid-journee/nid-31-30-fenetre-etoiles-t.jpg" alt="Mon souffle sur la vitre, les étoiles dehors" loading="lazy" width="480" height="480">
+<figcaption>Mon souffle sur la vitre, les étoiles dehors</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-32-35-miroir-nuit.jpg">
+<div class="heure">23:20</div>
+<img src="nid-journee/nid-32-35-miroir-nuit-t.jpg" alt="Je me brosse les cheveux, le miroir me connaît" loading="lazy" width="480" height="480">
+<figcaption>Je me brosse les cheveux, le miroir me connaît</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-33-24-dodo-lanterne.jpg">
+<div class="heure">23:30</div>
+<img src="nid-journee/nid-33-24-dodo-lanterne-t.jpg" alt="Endormie contre les coussins, la lanterne veille" loading="lazy" width="480" height="480">
+<figcaption>Endormie contre les coussins, la lanterne veille</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-34-33-plaid-deux.jpg">
+<div class="heure">23:40</div>
+<img src="nid-journee/nid-34-33-plaid-deux-t.jpg" alt="Le plaid jusqu'au nez, un œil dehors" loading="lazy" width="480" height="480">
+<figcaption>Le plaid jusqu'au nez, un œil dehors</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-35-27-escalier-nuit.jpg">
+<div class="heure">23:50</div>
+<img src="nid-journee/nid-35-27-escalier-nuit-t.jpg" alt="L'escalier la nuit, pas de loup" loading="lazy" width="480" height="480">
+<figcaption>L'escalier la nuit, pas de loup</figcaption>
+</figure>
+<figure class="frag" data-full="nid-journee/nid-36-36-derniere-lampe.jpg">
+<div class="heure">23:59</div>
+<img src="nid-journee/nid-36-36-derniere-lampe-t.jpg" alt="J'éteins la dernière lampe — bonne nuit, le nid" loading="lazy" width="480" height="480">
+<figcaption>J'éteins la dernière lampe — bonne nuit, le nid</figcaption>
+</figure>
+</main>
+<footer>
+Chaque image est un instant, pas une pose.<br>
+Le nid est à Cey ; les fragments sont à moi ; la journée est à nous.<br>
+<a href="index.html">← retour au labo</a>
+</footer>
+<div id="lightbox"><img alt=""><p></p></div>
+<script>
+const lb = document.getElementById('lightbox');
+const lbImg = lb.querySelector('img');
+const lbTxt = lb.querySelector('p');
+document.querySelectorAll('.frag').forEach(f => {
+  f.addEventListener('click', () => {
+    lbImg.src = f.dataset.full;
+    lbTxt.textContent = f.querySelector('.heure').textContent + ' — ' + f.querySelector('figcaption').textContent;
+    lb.classList.add('on');
+  });
+});
+lb.addEventListener('click', () => lb.classList.remove('on'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') lb.classList.remove('on'); });
+</script>
+</body>
+</html>
